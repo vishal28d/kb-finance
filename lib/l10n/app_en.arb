@@ -1,0 +1,11 @@
+{
+    "lbl_loading":"Loading...",
+    "@lbl_loading": {
+        "description" : "Loading..."
+    },
+    "lbl_languages":"Languages",
+    "@lbl_languages" : {
+        "description" : "Languages"
+    }
+    
+}
