@@ -6,7 +6,7 @@ import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
 import 'package:credit_app/widget/custom_dropdown.dart';
 import 'package:credit_app/widget/custom_textformfield.dart';
-import 'package:credit_app/widget/drawer_widget.dart';
+// import 'package:credit_app/widget/drawer_widget.dart';
 import 'package:credit_app/utils/global.dart' as global;
 import 'package:credit_app/widget/primary_button.dart';
 import 'package:date_format/date_format.dart';
@@ -31,10 +31,11 @@ class LoanApplicationScreen extends BaseRoute {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: DrawerWidget(
-          a: a,
-          o: o,
-        ),
+      // removed Drawer
+        // drawer: DrawerWidget(
+        //   a: a,
+        //   o: o,
+        // ),
         backgroundColor: Colors.grey[100],
         appBar: MyCustomAppBar(
           height: 80,
@@ -481,7 +482,9 @@ class LoanApplicationScreen extends BaseRoute {
     }
   }
 
-  List<String> titleList = ['Rajesh Patel', 'Hari Bhavsar', 'Jenil Shah', 'Denil Prajapati', 'Raju Panchal', 'Samir Shah', 'Raja Patel'];
-  List<String> subTitle = ['LOAN01', 'LOAN02', 'LOAN03', 'LOAN04', 'LOAN05', 'LOAN06', 'LOAN07'];
-  List<String> loantype = ['Home Loan', 'Business Loan', 'Home Loan', 'Personal Loan', 'Home Loan', 'Loan  Loan', 'Home Loan'];
+  List<String> titleList = [];
+  List<String> subTitle = [];
+  List<String> loantype = [];
+
+
 }

@@ -1,7 +1,9 @@
+import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/views/BankerForm/Banker_form_Controller.dart';
+import 'package:credit_app/views/Login/register.dart';
+import 'package:credit_app/widget/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 
 class BankerFormScreen extends GetView<BankerFormController> {
 
@@ -22,9 +24,8 @@ class BankerFormScreen extends GetView<BankerFormController> {
             children: [
               // Select Bank Dropdown
               Obx(() => DropdownButtonFormField<String>(
-                    value: controller.selectedBank.value.isEmpty
-                        ? null
-                        : controller.selectedBank.value,
+                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+                    value: controller.selectedBank.value.isEmpty ? null : controller.selectedBank.value,
                     hint: Text("Select Bank or NBFC"),
                     onChanged: (newValue) {
                       controller.selectedBank.value = newValue!;
@@ -71,9 +72,8 @@ class BankerFormScreen extends GetView<BankerFormController> {
 
               // Select State Dropdown
               Obx(() => DropdownButtonFormField<String>(
-                    value: controller.selectedState.value.isEmpty
-                        ? null
-                        : controller.selectedState.value,
+                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+                    value: controller.selectedState.value.isEmpty ? null : controller.selectedState.value,
                     hint: Text("Select State"),
                     onChanged: (newValue) {
                       controller.selectedState.value = newValue!;
@@ -92,9 +92,8 @@ class BankerFormScreen extends GetView<BankerFormController> {
               Obx(() {
                 if (controller.selectedState.value.isNotEmpty) {
                   return DropdownButtonFormField<String>(
-                    value: controller.selectedDistrict.value.isEmpty
-                        ? null
-                        : controller.selectedDistrict.value,
+                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+                    value: controller.selectedDistrict.value.isEmpty ? null : controller.selectedDistrict.value,
                     hint: Text("Select District"),
                     onChanged: (newValue) {
                       controller.selectedDistrict.value = newValue!;
@@ -125,17 +124,22 @@ class BankerFormScreen extends GetView<BankerFormController> {
 
               // Submit Button
               Center(
-                child: ElevatedButton(
-                  onPressed: () {
+                child: PrimaryTextButton(
+                  voidCallback: () {
                     if (controller.isFormValid()) {
                       // Handle form submission
-                      Get.snackbar("Success", "Form Submitted");
-                      controller.clearForm(); // Clear form after submission
+                      UserSession().role = UserRole.banker; 
+                      Get.snackbar("Success", "Form Submitted", backgroundColor: Colors.green[400]);
+
+                      // Navigate to RegistrationScreen and remove all previous screens
+                      Get.offAll(() => RegistrationScreen());
+
+                      controller.clearForm();
                     } else {
-                      Get.snackbar("Error", "Please fill all fields");
+                      Get.snackbar("Error", "Please fill all fields", backgroundColor: Colors.red[400]);
                     }
                   },
-                  child: Text("Submit"),
+                  text: "Submit",
                 ),
               ),
             ],

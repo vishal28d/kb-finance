@@ -15,14 +15,22 @@ import 'package:credit_app/views/splash/splash_screen.dart';
 import 'package:credit_app/utils/binding/networkBinding.dart';
 import 'package:provider/provider.dart';
 
+// Firebase 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:credit_app/firebase_options.dart';
+
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(ChangeNotifierProvider(
     create: (_) => LocaleProvider(),
     child: MyApp(),
   ));
 }
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -35,7 +43,7 @@ class MyApp extends StatelessWidget {
         theme: nativeTheme(),
         initialBinding: NetworkBinding(),
         locale: provider.locale,
-        title: 'Flutter Demo',
+        title: 'KB Finance',
         supportedLocales: L10n.all,
         localizationsDelegates: [
           AppLocalizations.delegate,

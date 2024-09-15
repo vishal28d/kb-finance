@@ -1,7 +1,5 @@
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_app/controllers/lean_controller.dart';
-import 'package:credit_app/services/fetchDbData.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
 import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
@@ -11,19 +9,15 @@ import 'package:credit_app/widget/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 
-// ignore: must_be_immutable
-class AddLeadScreen extends BaseRoute {
+
+class EditLeadScreen extends BaseRoute {
   //a - analytics
   //o - observer
-  AddLeadScreen({a, o}) : super(a: a, o: o, r: 'AddLeadScreen');
+  EditLeadScreen({a, o}) : super(a: a, o: o, r: 'EditLeadScreen');
 
    final AddLeadController leadsController = Get.find<AddLeadController>();
-
-  // Firebase Instance 
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 
   @override
@@ -41,7 +35,7 @@ class AddLeadScreen extends BaseRoute {
         ),
         height: 80,
         appbarPadding: 0,
-        title: Text('Add Lead'),
+        title: Text('Edit Lead Details'),
         centerTitle: true,
       ),
       body: GetBuilder<AddLeadController>(
@@ -123,44 +117,6 @@ class AddLeadScreen extends BaseRoute {
                               },
                             ),
                           ),
-
-
-                           Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Date',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                                child: Obx(() => InkWell(
-                                  onTap: () async {
-                                    DateTime? pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: leadsController.pickedDate.value,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2101),
-                                      );
-                                      if (pickedDate != null) {
-                                        leadsController.pickedDate.value= pickedDate; 
-                                      }
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        DateFormat('dd/MM/yyyy').format(leadsController.pickedDate.value),
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  )),
-                                ),
-
-
                           Padding(
                             padding: EdgeInsets.only(top: 15),
                             child: Text(
@@ -302,45 +258,24 @@ class AddLeadScreen extends BaseRoute {
       bottomNavigationBar: CommonPadding(
         child: PrimaryTextButton(
           text: "Submit",
-          voidCallback: () async {  
-
-            print(fetchLeads().toString()) ;
+          voidCallback: () { 
+            var leadDetails = leadsController.getLeadDetails();
             
-           if( leadsController.validateForm() ) {
-             var leadDetails = leadsController.getLeadDetails();
+            Get.snackbar(
+                     "Success", // Title
+                     "Lead Editted successfully", // Message
+                     snackPosition: SnackPosition.TOP, 
+                     backgroundColor: Colors.red[400] ,
+                     duration: Duration(seconds: 2),
+                     
+                  );
 
-        try {
-            await firestore.collection('leadDetails').add({
-           'details': leadDetails,
-           'createdAt': FieldValue.serverTimestamp(),
-        });
+                    Future.delayed(Duration(seconds: 2), () {
+                                    Get.back();
+                            });
+                
 
-        Get.snackbar(
-          "Success", 
-          "Lead Added successfully", 
-          snackPosition: SnackPosition.TOP, 
-          backgroundColor: Colors.red[400],
-          duration: Duration(seconds: 2),
-        );
-
-        Future.delayed(Duration(seconds: 2), () {
-          Get.back();
-        });
-
-        print(leadDetails);
-
-      } catch (e) {
-        print(e) ;
-        Get.snackbar(
-          "Error", 
-          "Failed to add lead: $e", 
-          snackPosition: SnackPosition.TOP, 
-          backgroundColor: Colors.red[400],
-          duration: Duration(seconds: 3),
-        );
-      }
-          
-    }
+             print(leadDetails);
          
 
           },

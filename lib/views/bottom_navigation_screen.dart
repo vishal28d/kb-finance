@@ -1,5 +1,6 @@
 //flutter
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/controllers/bottom_nav_controller.dart';
 import 'package:credit_app/views/Home/home_screen.dart';
 import 'package:credit_app/views/Home/home_screen2.dart';
@@ -20,7 +21,8 @@ class BottomNavigationScreen extends BaseRoute {
         bottomNavController.home2Activated
             ? HomeScreen2(
                 a: a,
-                o: o,
+                o: o, 
+   
               )
             : HomeScreen(
                 a: a,

@@ -1,6 +1,9 @@
 //flutter
 import 'package:credit_app/controllers/loginController.dart';
+import 'package:credit_app/views/Login/googleSignIn.dart';
+import 'package:credit_app/views/Login/register.dart';
 import 'package:credit_app/views/OtpVerification/otp_verification_screen.dart';
+import 'package:credit_app/views/bottom_navigation_screen.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
 import 'package:credit_app/widget/common_padding.dart';
 import 'package:credit_app/widget/custom_textformfield.dart';
@@ -10,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:credit_app/widget/baseRoute.dart';
 //packages
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends BaseRoute {
   LoginScreen({a, o}) : super(a: a, o: o, r: 'LoginScreen');
@@ -45,7 +49,8 @@ class LoginScreen extends BaseRoute {
                         Align(
                           alignment: Alignment.center,
                           child: Text(
-                            'Login',
+                            // 'Login',  
+                            "Enter",
                             style: Theme.of(context).textTheme.headlineMedium,
                           ),
                         ),
@@ -79,17 +84,46 @@ class LoginScreen extends BaseRoute {
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
                     child: PrimaryTextButton(
-                      text: "Get OTP",
+                      // text: "Get OTP",  
+                      text: "Continue",
                       voidCallback: () {
-                        Get.to(
-                            () => OtpVerificationScreen(
-                                  a: a,
-                                  o: o,
-                                ),
-                            routeName: "OTP Verification");
+
+                        // Get.to(
+                        //     () => OtpVerificationScreen(
+                        //           a: a,
+                        //           o: o,
+                        //         ),
+                        //     routeName: "OTP Verification");
+
+                         Get.to(
+                        () => BottomNavigationScreen(
+                              a: a,
+                              o: o,
+                            ),
+                        routeName: "Home");
+
                       },
                     ),
-                  )
+                  ),
+
+                GestureDetector(
+                
+                  child: Padding(
+                    padding: EdgeInsets.all(10) ,
+                    child: TextButton( onPressed: ()=> Get.to(()=> RegistrationScreen()) ,
+                    child: Text("Go to register page"),  ),
+                  
+                  ),
+                ) ,
+                  
+                Padding(
+                  padding: EdgeInsets.all(10) ,
+                    child: TextButton( onPressed: ()=> Get.to(()=> GoogleSignInPage()) ,
+                    child: Text("Go to Google sign in page"),  ),
+                  
+                  ),
+
+
                 ],
               ),
             ),

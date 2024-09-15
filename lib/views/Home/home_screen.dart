@@ -7,7 +7,7 @@ import 'package:credit_app/views/OtherLoan/other_loan_screen.dart';
 import 'package:credit_app/views/OtherServices/other_service.dart';
 import 'package:credit_app/views/PersonalLoan/personal_loan_basic_detail_entry_plscreen3.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
-import 'package:credit_app/widget/drawer_widget.dart';
+// import 'package:credit_app/widget/drawer_widget.dart';
 import 'package:credit_app/widget/elevated_button_widget.dart';
 import 'package:credit_app/utils/global.dart' as global;
 import 'package:flutter/material.dart';
@@ -32,10 +32,10 @@ class HomeScreen extends BaseRoute {
         return Future.value(true);
       },
       child: Scaffold(
-          drawer: DrawerWidget(
-            a: a,
-            o: o,
-          ),
+          // drawer: DrawerWidget(
+          //   a: a,
+          //   o: o,
+          // ),
           backgroundColor: Colors.grey[100],
           appBar: MyCustomAppBar(
             height: 80,

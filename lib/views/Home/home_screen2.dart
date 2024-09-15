@@ -2,19 +2,25 @@
 //flutter
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart' as carousel_slider;
-// import 'package:carousel_slider/carousel_controller.dart' as carousel_slider;
+import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/controllers/business_loan_controller.dart';
 import 'package:credit_app/controllers/home_controller.dart';
 import 'package:credit_app/controllers/home_loan_controller.dart';
 import 'package:credit_app/controllers/loan_against_property_controller.dart';
 import 'package:credit_app/controllers/personal_loan_controller.dart';
+import 'package:credit_app/views/AffordableEMiCalculator/AffordableEmiCalculator.dart';
 import 'package:credit_app/views/CibilScore/cibili_score_check_screen.dart';
 import 'package:credit_app/views/EMICalculator/emi_calculator_screen.dart';
+import 'package:credit_app/views/FdCalculator/fd_calculator.dart';
+import 'package:credit_app/views/LoanApplications/loan_application_screen.dart';
+import 'package:credit_app/views/SimpleCalculator.dart/readymade_calculator.dart';
 import 'package:credit_app/views/Leads/lead_screen.dart';
 import 'package:credit_app/views/Notifications/notification_screen.dart';
 import 'package:credit_app/widget/drawer_widget.dart';
 import 'package:credit_app/widget/elevated_button_widget.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+
+
 //controllers
 import 'package:credit_app/utils/global.dart' as global;
 import 'package:credit_app/views/BusinessLoan/choose_screen_blscreen.dart';
@@ -33,9 +39,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //packages
 import 'package:get/get.dart';
 
+
 class HomeScreen2 extends BaseRoute {
+
   final HomeController homeController = Get.put(HomeController());
+     
   CarouselSliderController? carouselController;
+
+   final role = UserSession().role;
+
   int? selectedimg;
   List<Color> colors = [
     Color(0xFFFE2161),
@@ -47,16 +59,29 @@ class HomeScreen2 extends BaseRoute {
     Color(0xFFFE2161),
     Color(0xFF2DD0C3),
   ];
+
   List<String> loanNames = [
-    'Instant Loan',
     'Personal Loan',
     'Business Loan',
-    'Credit Card',
-    'Home Loan',
-    'Loan against property',
-    'Other Loan',
-    'Other Services'
+    'Balance Transfer',
+    'Professional Loan' ,
   ];
+
+  List<String> propertyLoanNames= [
+    'Home Loan',
+    'Mortage Loan',
+    'Commercial Purchase',
+    'Commercial Mortage' ,
+  ];
+
+  List<String> CarLoanNames= [
+    'New Car Purchase',
+    'Used Car Purchase',
+    'Car Refinance',
+    'Car Loan Transfer' ,
+  ];
+
+
   List<String> iconList = [
     'assets/bank.svg',
     'assets/businessman-and-dollar-coin-svgrepo-com.svg',
@@ -67,6 +92,7 @@ class HomeScreen2 extends BaseRoute {
     'assets/otherloan.svg',
     'assets/otherloanservice.svg'
   ];
+
   List<String> titleList = [
     'Credit Card',
     'Business Loan',
@@ -101,7 +127,7 @@ class HomeScreen2 extends BaseRoute {
   List<String> dataStatusList = [
     "Follow Up" ,
     "Login Cases" ,
-    "Approval Reject",
+    "Approval/Reject",
     "Disbursed Cases" ,
 
   ] ;
@@ -109,7 +135,7 @@ class HomeScreen2 extends BaseRoute {
 
   //a - analytics
   //o - observer
-  HomeScreen2({a, o}) : super(a: a, o: o, r: 'HomeScreen2');
+  HomeScreen2({ a, o}) : super(a: a, o: o, r: 'HomeScreen2');
   List<Widget> banners(context) {
     List<Widget> list = [];
     try {
@@ -212,6 +238,8 @@ class HomeScreen2 extends BaseRoute {
             ),
           ],
         ),
+
+
         body: SingleChildScrollView(
           child: CommonPadding(
             child: Column(
@@ -273,18 +301,18 @@ class HomeScreen2 extends BaseRoute {
                   );
                 }),
                
-
               // removed emi calculator in blue colour
               
               // card( emi calc) was removed
-
 
               // EMI Calculator 
 
                SingleChildScrollView(
                   child: Card(
-                    margin: EdgeInsets.only(top: 0 , bottom: 20 ),
+                    color: Color(0xFFC63437)  ,
+                    margin: EdgeInsets.only(top: 0 , bottom: 15 ),
                     child: Column(
+              
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
@@ -294,12 +322,12 @@ class HomeScreen2 extends BaseRoute {
                             'Calculate EMI for Customer',
                             style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(5, 5, 5, 25), // remodev padding 16,16
+                          padding: EdgeInsets.fromLTRB(5, 5, 5, 25), 
   
                           child: GridView.count(
                             physics: NeverScrollableScrollPhysics(),
@@ -319,29 +347,33 @@ class HomeScreen2 extends BaseRoute {
                                         } 
                                         
                                         else if (index == 1) {
-                                          Get.delete<PersonalLoanController>();
-                                          Get.to(() => BasicDetailEntryPLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } else if (index == 2) {
-                                          Get.delete<BusinessLoanController>();
-                                          Get.to(() => ChooseScreenBLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
+
+                                          Get.to(()=> AffordableEmiCalculator() ) ;
+                                         
+                                          // Get.to(() => BasicDetailEntryPLScreen(
+                                          //       a: a,
+                                          //       o: o,
+                                          //     ));
+                                        } 
+                                        else if (index == 2) {
+
+                                          Get.to(() => FixedDepositCalculator()) ;
+
+                                          // Get.to(() => ChooseScreenBLScreen(
+                                          //       a: a,
+                                          //       o: o,
+                                          //     ));
                                         } 
                                         else if (index == 3) {
-
+                                          Get.to(()=> ReadyMadeCalculator() ) ;
                                         } 
                                         
-                                        else if (index == 4) {
-                                          Get.delete<HomeLoanController>();
-                                          Get.to(() => chooseScreenHLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } 
+                                        // else if (index == 4) {
+                                        //   Get.to(() => chooseScreenHLScreen(
+                                        //         a: a,
+                                        //         o: o,
+                                        //       ));
+                                        // } 
                
                                       },
                   
@@ -352,10 +384,10 @@ class HomeScreen2 extends BaseRoute {
                                             height: 60,
                                             width: 60,
                                               margin:
-                                                  EdgeInsets.only(left: 1, right: 1),
+                                              EdgeInsets.only(left: 1, right: 1),
                                              
                                               decoration: BoxDecoration(
-                                                  color: Colors.red[400],
+                                                  color: Colors.white ,
                                                   border: Border.all(
                                                     color: Colors.grey.shade500,
                                                   ),
@@ -365,7 +397,7 @@ class HomeScreen2 extends BaseRoute {
                                                       ),
                                               child: Padding(
                                                 padding: EdgeInsets.only(
-                                                    left: 10, right: 10, top: 0),
+                                                    left: 10 , right: 10 , top: 0),
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
@@ -379,7 +411,7 @@ class HomeScreen2 extends BaseRoute {
                                                           height: 45 ,
                                                           // color: colors[index],
                                                           // ignore: deprecated_member_use
-                                                          color: Colors.white,
+                                                          color: Color(0xFFC63437)  ,
                                                           
                                                         )
                                                       ),
@@ -394,14 +426,13 @@ class HomeScreen2 extends BaseRoute {
                                             Expanded(  
                                                   
                                                 child: Container(
-                                                   
                                                     child: Text(
                                                     '${calculatorList[index]}',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 12,  
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.normal,
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w600,
                                                     ),
                                                     maxLines: 2, 
                                                     overflow: TextOverflow.visible, 
@@ -409,13 +440,12 @@ class HomeScreen2 extends BaseRoute {
                                                 ),
 
                                          ),
-
-                                                   
-                                        ],
-                                      ),
+                       
+                                       ],
+                                    ),
                   
-                                    )
-                                  ),
+                                  )
+                              ),
                           ),
                         ),
                       ],
@@ -425,10 +455,13 @@ class HomeScreen2 extends BaseRoute {
 
 
               // Data Status 
-              
+        if( role == UserRole.banker)      // condition for banker
                SingleChildScrollView(
                   child: Card(
-                    margin: EdgeInsets.only(top: 0 , bottom: 20 ),
+                    shadowColor: Color(0xFFC63437) ,
+                    elevation: 3,
+                      
+                    margin: EdgeInsets.only(top: 0 , bottom: 15 ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -439,13 +472,13 @@ class HomeScreen2 extends BaseRoute {
                             'Data Status',
                             style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: Color(0xFFC63437) ,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.fromLTRB(5, 5, 5, 25), 
-                          // padding: EdgeInsets.symmetric(vertical: 16 , horizontal: 16),
+                      
                           child: GridView.count(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -464,28 +497,22 @@ class HomeScreen2 extends BaseRoute {
                                         } 
                                         
                                         else if (index == 1) {
-                                          Get.delete<PersonalLoanController>();
-                                          Get.to(() => BasicDetailEntryPLScreen(
+                                           Get.to(() => (LoanApplicationScreen(
                                                 a: a,
                                                 o: o,
-                                              ));
-                                        } else if (index == 2) {
-                                          Get.delete<BusinessLoanController>();
-                                          Get.to(() => ChooseScreenBLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
+                                                )));
+                                        }                
+                                        
+                                        else if (index == 2) {
+                                          
+
                                         } 
                                         else if (index == 3) {
 
                                         } 
                                         
                                         else if (index == 4) {
-                                          Get.delete<HomeLoanController>();
-                                          Get.to(() => chooseScreenHLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
+                                          
                                         } 
                
                                       },
@@ -500,9 +527,10 @@ class HomeScreen2 extends BaseRoute {
                                                   EdgeInsets.only(left: 1, right: 1),
                                              
                                               decoration: BoxDecoration(
-                                                  color: Colors.red[400],
+                                                  color: Colors.white ,
                                                   border: Border.all(
-                                                    color: Colors.grey.shade500,
+                                                    color: Color(0xFFC63437) ,
+                                                    width: 2 ,
                                                   ),
                                                   borderRadius: BorderRadius.all(
                                                       Radius.circular(15)
@@ -523,7 +551,7 @@ class HomeScreen2 extends BaseRoute {
                                                           height: 45 ,
                                                           // color: colors[index],
                                                           // ignore: deprecated_member_use
-                                                          color: Colors.white,
+                                                          color: Color(0xFFC63437) ,
                                                           
                                                         )
                                                       ),
@@ -542,8 +570,8 @@ class HomeScreen2 extends BaseRoute {
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 12,  
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.normal,
+                                                      color: Color(0xFFC63437) ,
+                                                      fontWeight: FontWeight.w600  ,
                                                     ),
                                                     maxLines: 2, 
                                                     overflow: TextOverflow.visible, 
@@ -565,11 +593,122 @@ class HomeScreen2 extends BaseRoute {
                   ),
                 ),
 
-                                                   // unsecured loans
 
-                SingleChildScrollView(
+        // unsecured loans
+
+SingleChildScrollView(
+  child: Card(
+    color: Color(0xFFC63437),  // Applying custom color
+    margin: EdgeInsets.only(top: 0, bottom: 10),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
+          child: Text(
+            'Unsecured Loans',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white, // Changing text color to white
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 25),
+          child: GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 20,
+            crossAxisCount: 4,
+            children: List.generate(
+              4 ,
+              (index) => GestureDetector(
+                onTap: () {
+                  // Handle onTap
+                  if (index == 0) {
+                    // Action for first item
+                  } else if (index == 1) {
+                    // Get.delete<PersonalLoanController>();
+                    // Get.to(() => BasicDetailEntryPLScreen(a: a, o: o));
+                  } else if (index == 2) {
+                    // Get.delete<BusinessLoanController>();
+                    // Get.to(() => ChooseScreenBLScreen(a: a, o: o));
+                  } else if (index == 3) {
+                    // Additional actions for other items
+                  }
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      margin: EdgeInsets.only(left: 1, right: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey.shade500,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10, right: 10, top: 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                              width: 32,
+                              child: SvgPicture.asset(
+                                iconList[index],
+                                height: 45,
+                                // ignore: deprecated_member_use
+                                color: Color(0xFFC63437),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Expanded(
+                      child: Container(
+                        child: Text(
+                          '${loanNames[index]}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white, 
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.visible,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
+
+      // Check Cibil // removed 
+
+        // Car Loan 
+
+       SingleChildScrollView(
                   child: Card(
-                    margin: EdgeInsets.only(top: 0 , bottom: 10 ),
+                    shadowColor: Color(0xFFC63437) ,
+                    elevation: 3,
+                      
+                    margin: EdgeInsets.only(top: 0 , bottom: 15 ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -577,15 +716,16 @@ class HomeScreen2 extends BaseRoute {
                           padding: EdgeInsets.only(
                               left: 15, right: 15, bottom: 5, top: 5),
                           child: Text(
-                            'Unsecured Loans',
+                            'Car Loan',
                             style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: Color(0xFFC63437) ,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.fromLTRB(5, 5, 5, 25), 
+                      
                           child: GridView.count(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -593,50 +733,39 @@ class HomeScreen2 extends BaseRoute {
                             mainAxisSpacing: 20 ,
                             crossAxisCount: 4,
                             children: List.generate(
-                                8,
+                                4,
                                 (index) => GestureDetector(
                                       onTap: () {
                                         if (index == 0) {
-                                        } else if (index == 1) {
-                                          Get.delete<PersonalLoanController>();
-                                          Get.to(() => BasicDetailEntryPLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } else if (index == 2) {
-                                          Get.delete<BusinessLoanController>();
-                                          Get.to(() => ChooseScreenBLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } else if (index == 3) {
-                                        } else if (index == 4) {
-                                          Get.delete<HomeLoanController>();
-                                          Get.to(() => chooseScreenHLScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } else if (index == 5) {
-                                          Get.delete<
-                                              LoanAgainstPropertyController>();
-                                          Get.to(() => chooseScreenLAPScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } else if (index == 6) {
-                                          Get.to(() => OtherLoanScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        } else if (index == 7) {
-                                          Get.to(() => OtherServicesScreen(
-                                                a: a,
-                                                o: o,
-                                              ));
-                                        }
+                                          //  Get.to(() => (LeadListScreen(
+                                          //       a: a,
+                                          //       o: o,
+                                          //       )));
+                                        } 
+                                        
+                                        else if (index == 1) {
+                                          //  Get.to(() => (LoanApplicationScreen(
+                                          //       a: a,
+                                          //       o: o,
+                                          //       )));
+                                        }                
+                                        
+                                        else if (index == 2) {
+                                          
+
+                                        } 
+                                        else if (index == 3) {
+
+                                        } 
+                                        
+                                        else if (index == 4) {
+                                          
+                                        } 
+               
                                       },
                   
                                       child: Column(
+                                        
                                         children: [
                                           Container(
                                             height: 60,
@@ -645,12 +774,15 @@ class HomeScreen2 extends BaseRoute {
                                                   EdgeInsets.only(left: 1, right: 1),
                                              
                                               decoration: BoxDecoration(
-                                                  color: Colors.red[400],
+                                                  color: Colors.white ,
                                                   border: Border.all(
-                                                    color: Colors.grey.shade500,
+                                                    color: Color(0xFFC63437) ,
+                                                    width: 2 ,
                                                   ),
                                                   borderRadius: BorderRadius.all(
-                                                      Radius.circular(15))),
+                                                      Radius.circular(15)
+                                                        )
+                                                      ),
                                               child: Padding(
                                                 padding: EdgeInsets.only(
                                                     left: 10, right: 10, top: 0),
@@ -662,50 +794,40 @@ class HomeScreen2 extends BaseRoute {
                                                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                                                         width: 32 ,
                                                         child: SvgPicture.asset(
-                                                          iconList[index],
+                                                          iconList[index],                                                     
                                                           height: 45 ,
                                                           // color: colors[index],
                                                           // ignore: deprecated_member_use
-                                                          color: Colors.white,
+                                                          color: Color(0xFFC63437) ,
                                                           
                                                         )
                                                       ),
                                                         
-                                                    // Text(
-                                                    //   '${loanNames[index]}',
-                                                    //   textAlign: TextAlign.center,
-                                                    //   style: TextStyle(
-                                                    //       fontSize: 11,
-                                                    //       color: Colors.white,
-                                                    //       fontWeight:
-                                                    //           FontWeight.normal),
-                                                    // )
                                                   ],
                                                 ),
                                               )
                                             ),
                                                         
                                           SizedBox(height: 5,) ,
-                                                        
-                      Expanded(  
-                          child: Container(
-                          child: Text(
-                          '${loanNames[index]}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 12,  
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          maxLines: 2, 
-                          overflow: TextOverflow.visible, 
-                        ),
-                      ),
-                                         ),
-                                                   
+                                                  
+                                            Expanded(                                               
+                                                child: Container( 
+                                                    child: Text(
+                                                    '${CarLoanNames[index]}',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 12,  
+                                                      color: Color(0xFFC63437) ,
+                                                      fontWeight: FontWeight.w600  ,
+                                                    ),
+                                                    maxLines: 2, 
+                                                    overflow: TextOverflow.visible, 
+                                                  ),
+                                                ),
+                                         ),                                                
                                         ],
                                       ),
-                  
+      
                                     )
                                   ),
                           ),
@@ -715,66 +837,112 @@ class HomeScreen2 extends BaseRoute {
                   ),
                 ),
 
-               
+          // Property Loan 
 
+          
+SingleChildScrollView(
+  child: Card(
+    color: Color(0xFFC63437),  // Applying custom color
+    margin: EdgeInsets.only(top: 0, bottom: 10),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
+          child: Text(
+            'Property Loans',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white, // Changing text color to white
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 25),
+          child: GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 20,
+            crossAxisCount: 4,
+            children: List.generate(
+              4 ,
+              (index) => GestureDetector(
+                onTap: () {
+                  // Handle onTap
+                  if (index == 0) {
+                    // Action for first item
+                  } else if (index == 1) {
 
-      // Check Cibil
-
-                // Card(
-                //   margin: EdgeInsets.only(top: 10),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Padding(
-                //         padding: EdgeInsets.only(
-                //             left: 15, right: 15, bottom: 5, top: 10),
-                //         child: Text(
-                //           'CIBIL',
-                //           style: TextStyle(
-                //               fontSize: 16,
-                //               color: Colors.black,
-                //               fontWeight: FontWeight.bold),
-                //         ),
-                //       ),
-                //       Padding(
-                //         padding: const EdgeInsets.only(top: 0),
-                //         child: Padding(
-                //           padding: const EdgeInsets.all(10.0),
-                //           child: Container(
-                //             decoration: BoxDecoration(
-                //                 border: Border.all(
-                //                   color: Colors.grey.shade500,
-                //                 ),
-                //                 borderRadius:
-                //                     BorderRadius.all(Radius.circular(15))),
-                //             child: ListTile(
-                //               horizontalTitleGap: 5,
-                //               leading: Icon(
-                //                 FontAwesomeIcons.handPointRight,
-                //                 color: Color(0xFFFE2161),
-                //                 size: 35,
-                //               ),
-                //               title: Text(
-                //                 'Check CIBIL',
-                //                 style: Theme.of(context).textTheme.bodyLarge,
-                //               ),
-                //               onTap: () {
-                //                 Get.to(() => (CheckCIBILScoreScreen(
-                //                       a: a,
-                //                       o: o,
-                //                     )));
-                //               },
-                //               trailing: Icon(Icons.arrow_forward_ios),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // )
-
-
-
+                    // Get.delete<PersonalLoanController>();
+                    // Get.to(() => BasicDetailEntryPLScreen(a: a, o: o));
+                  } else if (index == 2) {
+                    // Get.delete<BusinessLoanController>();
+                    // Get.to(() => ChooseScreenBLScreen(a: a, o: o));
+                  } else if (index == 3) {
+                    // Additional actions for other items
+                  }
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      margin: EdgeInsets.only(left: 1, right: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey.shade500,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10, right: 10, top: 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                              width: 32,
+                              child: SvgPicture.asset(
+                                iconList[index],
+                                height: 45,
+                                // ignore: deprecated_member_use
+                                color: Color(0xFFC63437),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Expanded(
+                      child: Container(
+                        child: Text(
+                          '${propertyLoanNames[index]}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white, 
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.visible,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+      
 
 
               ],
@@ -782,6 +950,11 @@ class HomeScreen2 extends BaseRoute {
           ),
         ));
   }
+
+
+
+
+
 
   Widget loanCardlist(context) {
     return ListView.builder(
@@ -890,96 +1063,11 @@ class HomeScreen2 extends BaseRoute {
             ),
           );
         });
+
+        
   }
+
+
+
 }
 
-Widget pdflecturelist(context) {
-  return ListView.builder(
-      itemCount: 3,
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemBuilder: (BuildContext context, int index) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 15),
-          child: Card(
-            margin: EdgeInsets.all(10),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            child: Container(
-                padding: EdgeInsets.all(5),
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 7, top: 0),
-                          child: Column(
-                            children: [
-                              Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Theme.of(context).primaryColor,
-                                          spreadRadius: 3),
-                                    ],
-                                  ),
-                                  child: Container(
-                                    child: Icon(
-                                      Icons.menu_book,
-                                      size: 25,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                      Radius.circular(10),
-                                    )),
-                                    height: 50,
-                                    width: 50,
-                                  )),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 30, top: 20),
-                          //color: Colors.green,
-                          width: MediaQuery.of(context).size.width / 2,
-                          height: 80,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Test",
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text('ebook for ',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                )),
-          ),
-        );
-      });
-}

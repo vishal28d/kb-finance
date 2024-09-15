@@ -1,24 +1,23 @@
-//models
+import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/views/Profile/profile_entry_sreen.dart';
+import 'package:credit_app/views/introduction/introduction_screen.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
 import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
-import 'package:credit_app/widget/drawer_widget.dart';
+import 'package:credit_app/widget/elevated_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-//packages
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class ProfileScreen extends BaseRoute {
   ProfileScreen({a, o}) : super(a: a, o: o, r: 'ProfileScreen');
 
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: DrawerWidget(
-        a: a,
-        o: o,
-      ),
       backgroundColor: Colors.grey[100],
       appBar: MyCustomAppBar(
         actions: [
@@ -120,7 +119,7 @@ class ProfileScreen extends BaseRoute {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text('9595959595', style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text('--', style: Theme.of(context).textTheme.bodyLarge),
                       )
                     ],
                   ),
@@ -182,7 +181,7 @@ class ProfileScreen extends BaseRoute {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text('abc@gmail.com', style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text('--', style: Theme.of(context).textTheme.bodyLarge),
                       )
                     ],
                   ),
@@ -213,7 +212,7 @@ class ProfileScreen extends BaseRoute {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text('01-02-1996', style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text('--', style: Theme.of(context).textTheme.bodyLarge),
                       )
                     ],
                   ),
@@ -244,10 +243,27 @@ class ProfileScreen extends BaseRoute {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text('5677121220541264', style: Theme.of(context).textTheme.bodyLarge),
-                      )
+                        child: Text('--', style: Theme.of(context).textTheme.bodyLarge),
+                      ),
                     ],
                   ),
+                ),
+                SizedBox(height: 15),
+                Divider(),
+                SizedBox(height: 15),
+                ElevatedButton(
+                  child: Text('Log Out'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF800000), // Maroon color
+                    minimumSize: Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+               
+                },
+
                 ),
               ],
             )

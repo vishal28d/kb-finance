@@ -1,7 +1,8 @@
 // ignore_for_file: must_be_immutable
 //flutter
+import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/views/BankerForm/banker_form_screen.dart';
-import 'package:credit_app/views/Login/login_screen.dart';
+import 'package:credit_app/views/Login/register.dart';
 import 'package:credit_app/widget/shadow_button.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:credit_app/controllers/introductionController.dart';
@@ -20,6 +21,7 @@ class IntroductionScreen1 extends BaseRoute {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () {
         return Future.value(true);
@@ -28,7 +30,8 @@ class IntroductionScreen1 extends BaseRoute {
           backgroundColor: Colors.white,
           body: GetBuilder<IntroductionController>(builder: (controller) {
             return PageView.builder(
-                itemCount: _imageUrl.length,
+                // itemCount: _imageUrl.length ,
+                itemCount: 1 ,
                 controller: _pageController,
                 onPageChanged: (index) {
                   introductionController.setCurrentIndex(index);
@@ -111,8 +114,8 @@ class IntroductionScreen1 extends BaseRoute {
     );
   }
 
-  List<String> _titles = ['Welcome To KB Finance', 'Go Digital', 'Earn on Leads'];
-  List<String> _subtitles = ['Join the team of Digital Financial Advisors', 'Submit loan application of your customer digitally.Also track loan status on your app', 'Earn commissions even for just lead submission'];
+  List<String> _titles = ['Welcome To KB Finance', ];
+  List<String> _subtitles = ['Join the team of Digital Financial Advisors', ];
 
   List<String> _imageUrl = [
     'assets/intro1.jpg',
@@ -126,9 +129,9 @@ class IntroductionScreen1 extends BaseRoute {
       child: ShadowButton(
         text: title,
         voidCallback: () {
-          Get.to(() => LoginScreen(
-                a: a,
-                o: o,
+          UserSession().role = UserRole.customer; 
+          Get.to(() => RegistrationScreen(
+               
               ));
         },
       ),
@@ -141,6 +144,7 @@ class IntroductionScreen1 extends BaseRoute {
       child: ShadowButton(
         text: title,
         voidCallback: () {
+          UserSession().role = UserRole.banker; 
           Get.to(() => BankerFormScreen(
             
               ));
