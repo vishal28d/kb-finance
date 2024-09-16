@@ -22,7 +22,6 @@ class BottomNavigationScreen extends BaseRoute {
             ? HomeScreen2(
                 a: a,
                 o: o, 
-   
               )
             : HomeScreen(
                 a: a,
@@ -33,13 +32,14 @@ class BottomNavigationScreen extends BaseRoute {
           o: o,
         ),
         ProfileScreen(
-          a: a,
-          o: o,
+          // a: a,
+          // o: o,
         )
       ];
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () {
         return Future.value(true);

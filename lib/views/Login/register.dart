@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_app/views/bottom_navigation_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart'; // Ensure Firebase is initialized
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistrationScreen extends StatefulWidget {
   @override
@@ -18,12 +20,52 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    initializeFirebase();
+    checkIfLoggedIn();
+  }
+
+  Future<void> initializeFirebase() async {
+    try {
+      // Ensure Firebase is initialized before using any Firebase services
+      await Firebase.initializeApp();
+    } catch (e) {
+      print("Error initializing Firebase: $e");
+    }
+  }
+
+  // Check if the user is already logged in
+  Future<void> checkIfLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? isLoggedIn = prefs.getBool('isLoggedIn');
+
+    if (isLoggedIn != null && isLoggedIn) {
+      // If logged in, navigate to BottomNavigationScreen
+      Get.off(() => BottomNavigationScreen());
+    }
+  }
+
+  Future<void> saveLoginStatus(User user, String userName, String phoneNumber) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Save login status
+    await prefs.setBool('isLoggedIn', true);
+
+    // Save user details
+    await prefs.setString('email', user.email ?? '');
+    await prefs.setString('displayName', user.displayName ?? '');
+    await prefs.setString('name', userName);
+    await prefs.setString('phone', phoneNumber);
+  }
+
   Future<User?> handleSignIn() async {
     try {
       // Trigger Google Sign-In
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        return null;
+        return null; // User canceled sign-in
       }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
@@ -44,10 +86,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       String userName = nameController.text.trim();
       String phoneNumber = phoneController.text.trim();
 
-      // Determine the appropriate collection
+      // Store user data in Firestore
       CollectionReference collection = firestore.collection('UsersSignInData');
-
-      // Store user data in Firestore without role
       await collection.doc(user.uid).set({
         'email': user.email,
         'displayName': user.displayName,
@@ -55,10 +95,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         'phone': phoneNumber,
       });
 
+      // Save login status and user data locally
+      await saveLoginStatus(user, userName, phoneNumber);
+
       Get.snackbar('Success', 'Login Successful as ${user.displayName}', backgroundColor: Colors.green[400]);
 
       // Navigate to the home screen
-      Get.to(() => BottomNavigationScreen(), routeName: "Home");
+      Get.off(() => BottomNavigationScreen());
 
       return user;
     } catch (error) {
@@ -68,15 +111,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
   }
 
-  Future<bool> checkIfUserIsBanker(String userId) async {
-    DocumentSnapshot bankerDoc = await firestore.collection('BankersSignInData').doc(userId).get();
-    return bankerDoc.exists;
-  }
+  // void handleSignOut() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.clear(); // Clear SharedPreferences on sign out
 
-  void handleSignOut() async {
-    await auth.signOut();
-    await googleSignIn.signOut();
-  }
+  //   await auth.signOut();
+  //   await googleSignIn.signOut();
+
+  //   Get.snackbar('Signed Out', 'You have been signed out successfully', backgroundColor: Colors.blue[300]);
+  // }
 
   @override
   Widget build(BuildContext context) {

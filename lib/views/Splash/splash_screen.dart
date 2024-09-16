@@ -1,14 +1,45 @@
-//flutter
 import 'package:credit_app/controllers/splashController.dart';
+import 'package:credit_app/views/Introduction/introduction_screen.dart';
+import 'package:credit_app/views/Login/register.dart';
 import 'package:credit_app/widget/baseRoute.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:credit_app/views/bottom_navigation_screen.dart';
 import 'package:flutter/material.dart';
-//packages
 import 'package:get/get.dart';
+import 'package:win32/win32.dart';
 
-class SplashScreen extends BaseRoute {
-  SplashScreen({a, o}) : super(a: a, o: o, r: 'SplashScreen');
+class SplashScreen extends StatefulWidget {
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> {
   final SplashController customerController = Get.put(SplashController());
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      
+      if (isLoggedIn) {
+        // User is already logged in, navigate to BottomNavigationScreen
+        Get.off(() => BottomNavigationScreen());
+      } else {
+        // User is not logged in, navigate to IntroductionScreen1
+        Get.off(() => IntroductionScreen1());
+      
+      }
+    } catch (e) {
+      print('Error checking login status: $e');
+      // Handle error as needed, e.g., show an error message or navigate to a default screen
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

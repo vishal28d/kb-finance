@@ -118,7 +118,7 @@ class LoginScreen extends BaseRoute {
                   
                 Padding(
                   padding: EdgeInsets.all(10) ,
-                    child: TextButton( onPressed: ()=> Get.to(()=> GoogleSignInPage()) ,
+                    child: TextButton( onPressed: ()=> Get.to(()=> BottomNavigationScreen()) ,
                     child: Text("Go to Google sign in page"),  ),
                   
                   ),

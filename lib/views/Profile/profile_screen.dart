@@ -9,11 +9,52 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends BaseRoute {
-  ProfileScreen({a, o}) : super(a: a, o: o, r: 'ProfileScreen');
+class ProfileScreen extends StatefulWidget {
 
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  String? name;
+  String? phone;
+  String? email ;
+  String? displayName ;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserData(); // Call getUserData when the screen initializes
+  }
+
+  Future<void> getUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    email = prefs.getString('email');
+    displayName = prefs.getString('displayName');
+    name = prefs.getString('name');
+    phone = prefs.getString('phone');
+
+    print('User Data: $email, $displayName, $name, $phone');
+    setState(() {}); // Update UI after fetching user data
+  }
+
+  Future<void> _logOut() async {
+    try {
+      await googleSignIn.signOut();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      Get.off(() => IntroductionScreen1()); // Navigate to introduction screen after logging out
+      Get.snackbar('Signed Out', 'You have been signed out successfully', backgroundColor: Colors.blue[300]);
+    } catch (e) {
+      print('Error logging out: $e');
+      // Handle error as needed
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +65,8 @@ class ProfileScreen extends BaseRoute {
           IconButton(
             onPressed: () {
               Get.to(() => ProfileEntryScreen(
-                    a: a,
-                    o: o,
+                    // a: widget.a,
+                    // o: widget.o,
                   ));
             },
             icon: Icon(
@@ -82,7 +123,7 @@ class ProfileScreen extends BaseRoute {
                                 Row(
                                   children: [
                                     Text(
-                                      'UserName',
+                                      name ?? 'N/A',
                                       style: Theme.of(context).primaryTextTheme.headlineMedium,
                                     ),
                                   ],
@@ -119,7 +160,7 @@ class ProfileScreen extends BaseRoute {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text('--', style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text(phone ?? 'N/A', style: Theme.of(context).textTheme.bodyLarge),
                       )
                     ],
                   ),
@@ -150,7 +191,7 @@ class ProfileScreen extends BaseRoute {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text('abc@gmail.com', style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text( email ?? 'N/A' , style: Theme.of(context).textTheme.bodyLarge),
                       )
                     ],
                   ),
@@ -254,16 +295,13 @@ class ProfileScreen extends BaseRoute {
                 ElevatedButton(
                   child: Text('Log Out'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF800000), // Maroon color
+                    backgroundColor: Color(0xFF800000),
                     minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
-               
-                },
-
+                  onPressed: _logOut, // Use _logOut method for the log out button
                 ),
               ],
             )

@@ -18,11 +18,13 @@ import 'package:provider/provider.dart';
 // Firebase 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:credit_app/firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(ChangeNotifierProvider(
