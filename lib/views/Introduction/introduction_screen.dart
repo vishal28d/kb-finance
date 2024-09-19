@@ -1,5 +1,4 @@
 // ignore_for_file: must_be_immutable
-import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/views/BankerForm/banker_form_screen.dart';
 import 'package:credit_app/views/Login/register.dart';
 import 'package:credit_app/views/bottom_navigation_screen.dart';
@@ -7,7 +6,6 @@ import 'package:credit_app/widget/shadow_button.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:credit_app/controllers/introductionController.dart';
 import 'package:flutter/material.dart';
-import 'package:credit_app/widget/baseRoute.dart';
 
 //packages
 import 'package:get/get.dart';
@@ -46,7 +44,7 @@ class _IntroductionScreen1State extends State<IntroductionScreen1> {
       
       if (isLoggedIn) {
         // User is already logged in, navigate to BottomNavigationScreen
-        Get.off(() => BottomNavigationScreen());
+        Get.offAll(() => BottomNavigationScreen());
       } else {
         // User is not logged in, navigate to IntroductionScreen1
         Get.off(() => IntroductionScreen1());
@@ -124,7 +122,7 @@ class _IntroductionScreen1State extends State<IntroductionScreen1> {
 
                           _textButtonLetStart("Customer"),
                           _textButtonLetStart2("Banker"),
-                          
+
                           Padding(
                             padding: EdgeInsets.only(bottom: 0),
                             child: Align(
@@ -167,18 +165,19 @@ class _IntroductionScreen1State extends State<IntroductionScreen1> {
 
   List<String> _imageUrl = [
     'assets/intro1.jpg',
-    'assets/intro2.jpg',
-    'assets/intro3.jpg',
+    // 'assets/intro2.jpg',
+    // 'assets/intro3.jpg',
   ];
 
   Widget _textButtonLetStart(String? title) {
     return Container(
-      color: Color(0xFFC63437),
+      
       margin: EdgeInsets.only(left: 10, right: 10),
-      child: ShadowButton(
+      child: CustomShadowButton(
         text: title,
         voidCallback: () {
-          UserSession().role = UserRole.customer;
+          // UserSession().role = UserRole.customer;
+          userRole(title!) ;
           Get.to(() => RegistrationScreen());
         },
       ),
@@ -187,15 +186,52 @@ class _IntroductionScreen1State extends State<IntroductionScreen1> {
 
   Widget _textButtonLetStart2(String? title) {
     return Container(
-      color: Color(0xFFC63437),
+      
       margin: EdgeInsets.only(left: 10, right: 10),
-      child: ShadowButton(
+      child: CustomShadowButton(
         text: title,
         voidCallback: () {
-          UserSession().role = UserRole.banker;
+          // UserSession().role = UserRole.banker;
+          userRole(title!) ;
           Get.to(() => BankerFormScreen());
         },
       ),
     );
   }
+
+
+  Future<void> userRole(String role) async {
+       SharedPreferences prefs = await SharedPreferences.getInstance();
+       await  prefs.setString('UserRole', role) ;
+  }
 }
+
+
+class CustomShadowButton extends StatelessWidget {
+  final String? text;
+  final VoidCallback? voidCallback;
+  const CustomShadowButton({Key? key, this.text, this.voidCallback}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      padding: EdgeInsets.only(left: 15, right: 15),
+      width: MediaQuery.of(context).size.width,
+      child: TextButton(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(
+              Theme.of(context).primaryColor ,
+            ),
+            foregroundColor: WidgetStateProperty.all(Colors.white),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            )),
+            textStyle: WidgetStateProperty.all(TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          ),
+          onPressed: voidCallback,
+          child: Text('$text')),
+    );
+  }
+}
+

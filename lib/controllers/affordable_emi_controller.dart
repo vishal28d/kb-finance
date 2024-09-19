@@ -10,11 +10,17 @@ class AffordableEmiCalculatorController extends GetxController {
   var totalInterestPayable = 0.0.obs;
   var isCalculated = false.obs;
 
-  final emiAmountController = TextEditingController();
-  final annualInterestRateController = TextEditingController();
-  final yearsController = TextEditingController();
-  final monthsController = TextEditingController();
-  final daysController = TextEditingController();
+  TextEditingController emiAmountController = TextEditingController();
+  TextEditingController annualInterestRateController = TextEditingController();
+  TextEditingController yearsController = TextEditingController();
+  TextEditingController monthsController = TextEditingController();
+  TextEditingController daysController = TextEditingController();
+
+  FocusNode emiAmountFocusNode = FocusNode();
+  FocusNode annualInterestRateFocusNode = FocusNode();
+  FocusNode yearsFocusNode = FocusNode();
+  FocusNode monthsFocusNode = FocusNode();
+  FocusNode daysFocusNode = FocusNode();
 
   @override
   void onInit() {
@@ -23,11 +29,19 @@ class AffordableEmiCalculatorController extends GetxController {
 
   @override
   void onClose() {
-    emiAmountController.dispose();
-    annualInterestRateController.dispose();
-    yearsController.dispose();
-    monthsController.dispose();
-    daysController.dispose();
+  
+    // emiAmountController.dispose();
+    // annualInterestRateController.dispose();
+    // yearsController.dispose();
+    // monthsController.dispose();
+    // daysController.dispose();
+
+    // emiAmountFocusNode.dispose();
+    // annualInterestRateFocusNode.dispose();
+    // yearsFocusNode.dispose();
+    // monthsFocusNode.dispose();
+    // daysFocusNode.dispose();
+
     super.onClose();
   }
 

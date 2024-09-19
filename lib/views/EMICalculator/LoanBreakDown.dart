@@ -1,5 +1,4 @@
 import 'dart:math'; // Import the math library
-
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -23,7 +22,7 @@ class LoanBreakdownWidget extends StatelessWidget {
     double principalLoanAmountPercentage = loanAmount / totalPayment * 100;
     double totalInterestPercentage = totalInterestPayable / totalPayment * 100;
 
-    double effectInterestRatePerYear = effectiveRatePerYear(annualInterestRate , 12) ;
+    double effectiveInterestRatePerYear = effectiveRatePerYear(annualInterestRate , 12);
 
     // Define the custom color
     Color customTextColor = Color(0xFF16423C);
@@ -67,52 +66,53 @@ class LoanBreakdownWidget extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: customTextColor),
             ),
             SizedBox(height: 10),
-             Text(
+            Text(
               'Effective Rate per year',
               style: TextStyle(fontSize: 15, color: customTextColor),
             ),
             Text(
-              '₹ ${effectInterestRatePerYear.toStringAsFixed(2)}',
+              '${effectiveInterestRatePerYear.toStringAsFixed(2)}%',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: customTextColor),
             ),
-
-            SizedBox(height: 10,),
-            
-             Text(
+            SizedBox(height: 10),
+            Text(
               'Effective Rate per month',
               style: TextStyle(fontSize: 15, color: customTextColor),
             ),
             Text(
-              '₹ ${(effectInterestRatePerYear/12).toStringAsFixed(2)}',
+              '${(effectiveInterestRatePerYear / 12).toStringAsFixed(2)}%',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: customTextColor),
             ),
-
-            SizedBox(height: 10,),
-
             SizedBox(height: 20),
             Text(
               'Break-up of Total Payment',
               style: TextStyle(fontSize: 15, color: customTextColor),
             ),
-
-            SizedBox(height: 10,) ,
-
-            PieChart(
-              dataMap: dataMap,
-              chartRadius: MediaQuery.of(context).size.width / 2,
-              colorList: [Colors.green, Colors.orange],
-              chartValuesOptions: ChartValuesOptions(
-                showChartValuesInPercentage: true,
-                chartValueStyle: TextStyle(
-                  color: customTextColor,
+            SizedBox(height: 10),
+            Container(
+              height: 260,
+              child: PieChart(
+                dataMap: dataMap,
+                chartRadius: MediaQuery.of(context).size.width / 2.5,
+                colorList: [Colors.green, Colors.orange],
+                chartValuesOptions: ChartValuesOptions(
+                  showChartValues: true,
+                  showChartValuesInPercentage: true,
+                  showChartValuesOutside: true,
+                  chartValueStyle: TextStyle(
+                    color: customTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              legendOptions: LegendOptions(
-                legendPosition: LegendPosition.bottom,
-                legendTextStyle: TextStyle(color: customTextColor),
+                legendOptions: LegendOptions(
+                  legendPosition: LegendPosition.bottom,
+                  legendTextStyle: TextStyle(color: customTextColor),
+                  showLegends: true,
+                ),
+                chartType: ChartType.disc ,  
+
               ),
             ),
-            
           ],
         ),
       ),
@@ -126,15 +126,7 @@ class LoanBreakdownWidget extends StatelessWidget {
     return emi;
   }
 
-
- double effectiveRatePerYear(double nominalRate, int numberOfCompoundingPeriods) {
-  return pow((1 + (nominalRate / (numberOfCompoundingPeriods * 100))), numberOfCompoundingPeriods) - 1;
-}
-
-  
-  double effectiveRatePerMonth(double nominalRate, int numberOfCompoundingPeriods) {
-    return pow((1 + (nominalRate / (numberOfCompoundingPeriods * 100))), (numberOfCompoundingPeriods / 12)) - 1;
+  double effectiveRatePerYear(double nominalRate, int numberOfCompoundingPeriods) {
+    return pow((1 + (nominalRate / (numberOfCompoundingPeriods * 100))), numberOfCompoundingPeriods) - 1;
   }
-
-
 }

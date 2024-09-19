@@ -43,7 +43,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     if (isLoggedIn != null && isLoggedIn) {
       // If logged in, navigate to BottomNavigationScreen
-      Get.off(() => BottomNavigationScreen());
+      Get.offAll(() => BottomNavigationScreen());
     }
   }
 
@@ -101,25 +101,41 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       Get.snackbar('Success', 'Login Successful as ${user.displayName}', backgroundColor: Colors.green[400]);
 
       // Navigate to the home screen
-      Get.off(() => BottomNavigationScreen());
+      Get.offAll(() => BottomNavigationScreen());
 
       return user;
     } catch (error) {
-      print('Sign in failed: $error');
-      Get.snackbar("Error", "Sign In Failed: ${error.toString()}");
-      return null;
+    // Check if the error is related to internet connectivity
+    String errorMessage;
+
+    // Example: Check if the error message contains "SocketException" for connectivity issues
+    if (error.toString().contains("network_error")) {
+      errorMessage = "No internet connection. Please check your connection and try again.";
+    } else {
+      errorMessage = "Sign In Failed: ${error.toString()}";
     }
+
+    // Display error message using Snackbar
+    Get.snackbar("Error", errorMessage, backgroundColor: Colors.red[400]);
+
+    return null;
+  }
+    
   }
 
-  // void handleSignOut() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.clear(); // Clear SharedPreferences on sign out
+  void _validateAndSignIn() {
+    final userName = nameController.text.trim();
+    final phoneNumber = phoneController.text.trim();
 
-  //   await auth.signOut();
-  //   await googleSignIn.signOut();
-
-  //   Get.snackbar('Signed Out', 'You have been signed out successfully', backgroundColor: Colors.blue[300]);
-  // }
+    if (userName.isEmpty || phoneNumber.isEmpty) {
+      // Show Snackbar if fields are empty
+      Get.snackbar('Validation Error', 'Please enter both name and mobile number.',
+          backgroundColor: Colors.red[400]);
+    } else {
+      // Proceed with sign in
+      handleSignIn();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,8 +171,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       shape: BoxShape.circle,
                       color: Colors.grey[200],
                     ),
-                    child: Image.network(
-                      'https://img.freepik.com/free-vector/login-concept-illustration_114360-748.jpg?t=st=1726243306~exp=1726246906~hmac=b76d67d748f2a4294bd07b14b76aab5d78ac8ce15d3f29b1564a107628bedccb&w=740',
+                    child: Image.asset(
+                      'assets/registerPageImage.png' ,
                       height: 200,
                       width: 200,
                     ),
@@ -193,9 +209,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () {
-                      handleSignIn();
-                    },
+                    onPressed: _validateAndSignIn,
                   ),
                 ],
               ),

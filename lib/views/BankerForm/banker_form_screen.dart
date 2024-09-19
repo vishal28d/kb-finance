@@ -128,11 +128,11 @@ class BankerFormScreen extends GetView<BankerFormController> {
                   voidCallback: () {
                     if (controller.isFormValid()) {
                       // Handle form submission
-                      UserSession().role = UserRole.banker; 
+                  
                       Get.snackbar("Success", "Form Submitted", backgroundColor: Colors.green[400]);
 
                       // Navigate to RegistrationScreen and remove all previous screens
-                      Get.offAll(() => RegistrationScreen());
+                      Get.to(() => RegistrationScreen());
 
                       controller.clearForm();
                     } else {

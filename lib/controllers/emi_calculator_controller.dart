@@ -3,16 +3,22 @@ import 'package:get/get.dart';
 import 'dart:math'; // For interest calculations
 import 'package:intl/intl.dart'; // For formatting dates
 
-class EmiCalculatorController extends GetxController {
-  // TextEditingControllers
-  var loanamount1 = TextEditingController();
-  var interestrate1 = TextEditingController();
-  var duration1 = TextEditingController();
-  var floanamount1 = FocusNode();
-  var finterestrate1 = FocusNode();
-  var fduration1 = FocusNode();
+class EmiCalculatorController extends GetxController with WidgetsBindingObserver {
+  // TextEditingControllers for the input fields
+  TextEditingController loanAmountController = TextEditingController();
+  TextEditingController interestRateController = TextEditingController();
+  TextEditingController yearsController = TextEditingController();
+  TextEditingController monthsController = TextEditingController();
+  TextEditingController daysController = TextEditingController();
 
-  // Observables
+  // FocusNodes to manage focus on the input fields
+  FocusNode loanAmountFocusNode = FocusNode();
+  FocusNode interestRateFocusNode = FocusNode();
+  FocusNode yearsFocusNode = FocusNode();
+  FocusNode monthsFocusNode = FocusNode();
+  FocusNode daysFocusNode = FocusNode();
+
+  // Observables to manage state
   var loanAmount = 0.0.obs;
   var annualInterestRate = 0.0.obs;
   var loanTermMonths = 0.obs;
@@ -21,36 +27,48 @@ class EmiCalculatorController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Add this controller as an observer for app lifecycle events
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // No need to dispose controllers and focus nodes here
   }
 
   @override
   void onClose() {
-    // Dispose controllers and focus nodes
-    loanamount1.dispose();
-    interestrate1.dispose();
-    duration1.dispose();
-    floanamount1.dispose();
-    finterestrate1.dispose();
-    fduration1.dispose();
+    // Remove observer on page close
+    WidgetsBinding.instance.removeObserver(this); 
     super.onClose();
   }
 
+  // Method to reset the form and clear all fields
   void resetForm() {
-    loanamount1.text = '';
-    interestrate1.text = '';
-    duration1.text = '';
+    loanAmountController.clear();
+    interestRateController.clear();
+    yearsController.clear();
+    monthsController.clear();
+    daysController.clear();
     loanAmount.value = 0.0;
     annualInterestRate.value = 0.0;
     loanTermMonths.value = 0;
     repaymentSchedule.clear();
   }
 
+  // Method to calculate EMI and generate the repayment schedule
   void calculateEmi() {
-    double loanAmountValue = double.tryParse(loanamount1.text) ?? 0.0;
-    double annualInterestRateValue = double.tryParse(interestrate1.text) ?? 0.0;
-    int loanTermMonthsValue = int.tryParse(duration1.text) ?? 0;
+    // Parse the input values from the text fields
+    double loanAmountValue = double.tryParse(loanAmountController.text) ?? 0.0;
+    double annualInterestRateValue = double.tryParse(interestRateController.text) ?? 0.0;
+    int yearsValue = int.tryParse(yearsController.text) ?? 0;
+    int monthsValue = int.tryParse(monthsController.text) ?? 0;
+    int daysValue = int.tryParse(daysController.text) ?? 0;
 
-    // Update observables
+    // Convert the loan term into months, accounting for years, months, and days
+    int loanTermMonthsValue = (yearsValue * 12) + monthsValue + (daysValue ~/ 30);
+
+    // Update observables with parsed values
     loanAmount.value = loanAmountValue;
     annualInterestRate.value = annualInterestRateValue;
     loanTermMonths.value = loanTermMonthsValue;
@@ -58,37 +76,44 @@ class EmiCalculatorController extends GetxController {
     generateRepaymentSchedule();
   }
 
+  // Method to generate the repayment schedule
   void generateRepaymentSchedule() {
     double loanAmountValue = loanAmount.value;
     double annualInterestRateValue = annualInterestRate.value;
     int loanTermMonthsValue = loanTermMonths.value;
 
+    // Calculate monthly interest rate
     double monthlyInterestRate = annualInterestRateValue / 12 / 100;
-    double monthlyPayment = (loanAmountValue * monthlyInterestRate) /
+
+    // Formula to calculate EMI
+    double emi = (loanAmountValue * monthlyInterestRate) /
         (1 - pow(1 + monthlyInterestRate, -loanTermMonthsValue));
 
     double remainingBalance = loanAmountValue;
     List<Map<String, dynamic>> schedule = [];
 
+    // Loop through each month to create the repayment schedule
     for (int i = 0; i < loanTermMonthsValue; i++) {
       double interestPayment = remainingBalance * monthlyInterestRate;
-      double principalPayment = monthlyPayment - interestPayment;
+      double principalPayment = emi - interestPayment;
       remainingBalance -= principalPayment;
 
-      DateTime paymentDate = DateTime.now().add(Duration(days: i * 30)); // Approximate date
+      // Calculate payment date
+      DateTime paymentDate = DateTime.now().add(Duration(days: i * 30));
       String monthName = DateFormat('MMMM yyyy').format(paymentDate);
 
       schedule.add({
         'paymentNo': i + 1,
         'paymentDate': monthName,
         'beginningBalance': i == 0 ? loanAmountValue : schedule[i - 1]['endingBalance'],
-        'payment': monthlyPayment,
+        'payment': emi,
         'principal': principalPayment,
         'interest': interestPayment,
         'endingBalance': max(remainingBalance, 0),
       });
     }
 
-    repaymentSchedule.value = schedule;
+    // Update the repayment schedule observable
+    repaymentSchedule.value = schedule;     
   }
 }

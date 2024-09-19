@@ -108,62 +108,77 @@ class ReadyMadeCalculator extends StatelessWidget {
         title: const Text('Simple Calculator'),
         centerTitle: true,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end, // Align the calculator to the bottom
-        children: <Widget>[
-          // Display Input and Output using Obx (Reactive State Management)
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Obx(() => Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                        calculatorController.input.value,
-                        style: style.copyWith(
-                            color: const Color(0xff000000), fontSize: 30),
-                      ),
-                )),
-                Obx(() => Text(
-                      calculatorController.output.value ,
-                      style: style.copyWith(
-                          color: const Color(0xff000000),
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold),
-                    )),
-              ],
-            ),
-          ),
-
-          // Grid for calculator buttons
-          Expanded(
-            flex: 2,
-            child: GridView.builder(
-                itemCount: calculatorController.calButtonsList.length,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4),
-                itemBuilder: (BuildContext context, int index) {
-                  String buttonText = calculatorController.calButtonsList[index];
-
-                  return CalButton(
-                    onTapped: () {
-                      calculatorController.onButtonPressed(buttonText);
-                    },
-                    value: buttonText,
-                    color: calculatorController.isOperator(buttonText)
-                        ? const Color(0xff104E8B)
-                        : Colors.grey[200],
-                    btnTextStyle: style.copyWith(
-                      color: calculatorController.isOperator(buttonText)
-                          ? const Color(0xffffffff)
-                          : const Color(0xff000000),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end, // Align the calculator to the bottom
+                children: <Widget>[
+                  // Display Input and Output using Obx (Reactive State Management)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Obx(() => Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                calculatorController.input.value,
+                                style: style.copyWith(
+                                    color: const Color(0xff000000), fontSize: 30),
+                              ),
+                            )),
+                        Obx(() => FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                calculatorController.output.value,
+                                style: style.copyWith(
+                                    color: const Color(0xff000000),
+                                    fontSize: 45,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )),
+                      ],
                     ),
-                  );
-                }),
-          ),
-        ],
+                  ),
+
+                  // Grid for calculator buttons
+                  Padding(
+                    
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 30),
+                    child: GridView.builder(
+                        shrinkWrap: true, // Adjust the size based on children
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: calculatorController.calButtonsList.length,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4, childAspectRatio: 1.2),
+                        itemBuilder: (BuildContext context, int index) {
+                          String buttonText = calculatorController.calButtonsList[index];
+
+                          return CalButton(
+                            onTapped: () {
+                              calculatorController.onButtonPressed(buttonText);
+                            },
+                            value: buttonText,
+                            color: calculatorController.isOperator(buttonText)
+                                ? const Color(0xff104E8B)
+                                : Colors.grey[200],
+                            btnTextStyle: style.copyWith(
+                              color: calculatorController.isOperator(buttonText)
+                                  ? const Color(0xffffffff)
+                                  : const Color(0xff000000),
+                            ),
+                          );
+                        }),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -189,10 +204,11 @@ class CalButton extends StatelessWidget {
     return InkWell(
       onTap: onTapped!,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         child: Container(
-          height: 50,
-          width: 50,
+          height: 45 ,
+          width: 45 ,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(60)),
             color: color,

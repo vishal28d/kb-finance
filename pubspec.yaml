@@ -64,6 +64,15 @@ dependencies:
   google_sign_in: ^6.2.1
   firebase_auth: ^5.2.1
   shared_preferences: ^2.0.15
+  url_launcher: ^6.1.5     # for call 
+  pdf: ^3.6.5              # For PDF generation
+  printing: ^5.9.0         # For printing and saving the PDF
+  path_provider: ^2.0.11   # For accessing file system (if saving locally)
+  fl_chart: ^0.69.0
+
+
+
+
 
 dev_dependencies:
   flutter_test:

@@ -7,11 +7,10 @@ import 'package:get/get.dart';
 import 'package:credit_app/controllers/fd_calculator_controller.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
-
 class FixedDepositCalculator extends StatelessWidget {
   final FixedDepositController controller = Get.put(FixedDepositController());
 
-  var update = 0.obs ;
+  var update = 0.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +39,7 @@ class FixedDepositCalculator extends StatelessWidget {
                 'FD Amount',
                 'Enter FD amount',
                 TextInputType.numberWithOptions(signed: true, decimal: true),
-                (value) => controller.tempFdAmount.value = double.tryParse(value) ?? 0.0,
+                controller.fdAmountController,
               ),
               // Interest Rate Input
               _buildInputSection(
@@ -48,7 +47,7 @@ class FixedDepositCalculator extends StatelessWidget {
                 'Interest Rate (%)',
                 'Enter interest rate',
                 TextInputType.numberWithOptions(signed: true, decimal: true),
-                (value) => controller.tempRateOfInterest.value = double.tryParse(value) ?? 0.0,
+                controller.rateOfInterestController,
               ),
               // FD Start Date Input
               Padding(
@@ -103,11 +102,11 @@ class FixedDepositCalculator extends StatelessWidget {
               ),
               Row(
                 children: [
-                  _buildTextFormField('Years', (value) => controller.tempYears.value = int.tryParse(value) ?? 0),
+                  _buildTextFormField('Years', controller.yearsController),
                   SizedBox(width: 8),
-                  _buildTextFormField('Months', (value) => controller.tempMonths.value = int.tryParse(value) ?? 0),
+                  _buildTextFormField('Months', controller.monthsController),
                   SizedBox(width: 8),
-                  _buildTextFormField('Days', (value) => controller.tempDays.value = int.tryParse(value) ?? 0),
+                  _buildTextFormField('Days', controller.daysController),
                 ],
               ),
               // Calculate Button
@@ -116,9 +115,7 @@ class FixedDepositCalculator extends StatelessWidget {
                 child: PrimaryTextButton(
                   text: "Calculate",
                   voidCallback: () {
-                    controller.isCalculated.update((val) => {},) ;
                     controller.calculateMaturityAmount();
-    
                   },
                 ),
               ),
@@ -128,10 +125,7 @@ class FixedDepositCalculator extends StatelessWidget {
                 if (controller.isCalculated.value) {
                   return Padding(
                     padding: EdgeInsets.all(10),
-                    child: FDcalculatorCard(
-                        
-                    ),
-                    
+                    child: FDcalculatorCard(),
                   );
                 }
                 return SizedBox.shrink(); // Don't show anything if not calculated
@@ -143,7 +137,7 @@ class FixedDepositCalculator extends StatelessWidget {
     );
   }
 
-  Widget _buildInputSection(BuildContext context, String label, String hint, TextInputType inputType, Function(String) onChanged) {
+  Widget _buildInputSection(BuildContext context, String label, String hint, TextInputType inputType, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Column(
@@ -161,9 +155,8 @@ class FixedDepositCalculator extends StatelessWidget {
             child: CustomTextFormField(
               hintText: hint,
               obscureText: false,
-              key: key,
+              textEditingController: controller,
               textInputType: inputType,
-              onChanged: onChanged,
             ),
           ),
         ],
@@ -171,14 +164,13 @@ class FixedDepositCalculator extends StatelessWidget {
     );
   }
 
-  Widget _buildTextFormField(String hint, Function(String) onChanged) {
+  Widget _buildTextFormField(String hint, TextEditingController controller) {
     return Expanded(
       child: CustomTextFormField(
         hintText: hint,
         obscureText: false,
-        key: key,
+        textEditingController: controller,
         textInputType: TextInputType.numberWithOptions(signed: true, decimal: true),
-        onChanged: onChanged,
       ),
     );
   }

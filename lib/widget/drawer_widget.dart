@@ -113,8 +113,7 @@ class DrawerWidget extends BaseRoute {
                   ),
                   onTap: () {
                     Get.to(() => (EmiCalculatorScreen(
-                          a: a,
-                          o: o,
+                        
                         )));
                   },
                   trailing: Icon(Icons.arrow_forward_ios),

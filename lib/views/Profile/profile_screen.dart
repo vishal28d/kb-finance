@@ -1,10 +1,7 @@
-import 'package:credit_app/constants/userSession.dart';
 import 'package:credit_app/views/Profile/profile_entry_sreen.dart';
 import 'package:credit_app/views/introduction/introduction_screen.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
-import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
-import 'package:credit_app/widget/elevated_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -28,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    getUserData(); // Call getUserData when the screen initializes
+    getUserData(); 
   }
 
   Future<void> getUserData() async {
@@ -85,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(top: 15),
+              padding: EdgeInsets.only(top: 12),
               child: Card(
                   child: Column(
                 children: [
@@ -116,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(left: 25),
+                            padding: EdgeInsets.only(left: 20),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -191,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text( email ?? 'N/A' , style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text(  email ?? 'N/A' , style: Theme.of(context).textTheme.bodyLarge),
                       )
                     ],
                   ),

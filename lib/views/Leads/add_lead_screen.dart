@@ -1,6 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:credit_app/controllers/lean_controller.dart';
+import 'package:credit_app/controllers/lead_controller.dart';
 import 'package:credit_app/services/fetchDbData.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
 import 'package:credit_app/widget/baseRoute.dart';
@@ -21,10 +21,8 @@ class AddLeadScreen extends BaseRoute {
   AddLeadScreen({a, o}) : super(a: a, o: o, r: 'AddLeadScreen');
 
    final AddLeadController leadsController = Get.find<AddLeadController>();
-
   // Firebase Instance 
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-
 
   @override
   Widget build(BuildContext context) {
@@ -229,52 +227,55 @@ class AddLeadScreen extends BaseRoute {
                               },
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Aadhar Card No',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              hintText: "Enter your aadhar no",
-                              textEditingController: leadsController.aadharno,
-                              focusnode: leadsController.faadharno,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.numberWithOptions(signed: true, decimal: true),
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(
-                                  leadsController.fpanno,
-                                );
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'PAN Card No',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              hintText: "Enter your PAN No",
-                              textEditingController: leadsController.panno,
-                              focusnode: leadsController.fpanno,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.text,
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(
-                                  leadsController.flocation,
-                                );
-                              },
-                            ),
-                          ),
+
+                          // Padding(
+                          //   padding: EdgeInsets.only(top: 15),
+                          //   child: Text(
+                          //     'Aadhar Card No',
+                          //     style: Theme.of(context).textTheme.bodyLarge,
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: EdgeInsets.only(top: 8),
+                          //   child: CustomTextFormField(
+                          //     hintText: "Enter your aadhar no",
+                          //     textEditingController: leadsController.aadharno,
+                          //     focusnode: leadsController.faadharno,
+                          //     obscureText: false,
+                          //     key: key,
+                          //     textInputType: TextInputType.numberWithOptions(signed: true, decimal: true),
+                          //     onEditingComplete: () {
+                          //       FocusScope.of(context).requestFocus(
+                          //         leadsController.fpanno,
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
+
+                          // Padding(
+                          //   padding: EdgeInsets.only(top: 15),
+                          //   child: Text(
+                          //     'PAN Card No',
+                          //     style: Theme.of(context).textTheme.bodyLarge,
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: EdgeInsets.only(top: 8),
+                          //   child: CustomTextFormField(
+                          //     hintText: "Enter your PAN No",
+                          //     textEditingController: leadsController.panno,
+                          //     focusnode: leadsController.fpanno,
+                          //     obscureText: false,
+                          //     key: key,
+                          //     textInputType: TextInputType.text,
+                          //     onEditingComplete: () {
+                          //       FocusScope.of(context).requestFocus(
+                          //         leadsController.flocation,
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
+
                           Padding(
                             padding: EdgeInsets.only(top: 15),
                             child: Text(
@@ -319,13 +320,10 @@ class AddLeadScreen extends BaseRoute {
           "Success", 
           "Lead Added successfully", 
           snackPosition: SnackPosition.TOP, 
-          backgroundColor: Colors.red[400],
+          backgroundColor: Colors.green[400],
           duration: Duration(seconds: 2),
         );
 
-        Future.delayed(Duration(seconds: 2), () {
-          Get.back();
-        });
 
         print(leadDetails);
 

@@ -2,21 +2,17 @@
 //flutter
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart' as carousel_slider;
-import 'package:credit_app/constants/userSession.dart';
-import 'package:credit_app/controllers/business_loan_controller.dart';
 import 'package:credit_app/controllers/home_controller.dart';
 import 'package:credit_app/controllers/home_loan_controller.dart';
 import 'package:credit_app/controllers/loan_against_property_controller.dart';
-import 'package:credit_app/controllers/personal_loan_controller.dart';
 import 'package:credit_app/views/AffordableEMiCalculator/AffordableEmiCalculator.dart';
-import 'package:credit_app/views/CibilScore/cibili_score_check_screen.dart';
+import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
 import 'package:credit_app/views/EMICalculator/emi_calculator_screen.dart';
 import 'package:credit_app/views/FdCalculator/fd_calculator.dart';
 import 'package:credit_app/views/LoanApplications/loan_application_screen.dart';
 import 'package:credit_app/views/SimpleCalculator.dart/readymade_calculator.dart';
 import 'package:credit_app/views/Leads/lead_screen.dart';
 import 'package:credit_app/views/Notifications/notification_screen.dart';
-import 'package:credit_app/widget/drawer_widget.dart';
 import 'package:credit_app/widget/elevated_button_widget.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 
@@ -31,24 +27,46 @@ import 'package:credit_app/views/OtherServices/other_service.dart';
 import 'package:credit_app/views/PersonalLoan/personal_loan_basic_detail_entry_plscreen3.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
 //models
-import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
 import 'package:flutter/material.dart' hide CarouselController;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //packages
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-class HomeScreen2 extends BaseRoute {
+class HomeScreen2 extends StatefulWidget {
 
+  @override
+  State<HomeScreen2> createState() => _HomeScreen2State();
+}
+
+class _HomeScreen2State extends State<HomeScreen2> {
   final HomeController homeController = Get.put(HomeController());
-     
+
   CarouselSliderController? carouselController;
 
-   final role = UserSession().role;
+  String UserRole = 'Customer' ; 
+
+  Future<void> setUserRole() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+      UserRole = prefs.getString('UserRole') ?? 'Customer'; 
+      });
+      print(UserRole);
+}
+
+  @override
+  void initState() {
+    super.initState();
+    setUserRole() ;
+
+  }
+
 
   int? selectedimg;
+
   List<Color> colors = [
     Color(0xFFFE2161),
     Color(0xFF58C0FC),
@@ -81,7 +99,6 @@ class HomeScreen2 extends BaseRoute {
     'Car Loan Transfer' ,
   ];
 
-
   List<String> iconList = [
     'assets/bank.svg',
     'assets/businessman-and-dollar-coin-svgrepo-com.svg',
@@ -101,6 +118,7 @@ class HomeScreen2 extends BaseRoute {
     'Other Loan',
     'Other Services'
   ];
+
   List<String> subTitle = [
     'Get up to ${global.currencySymbol}75 lac for 72 months EMI',
     'Get up to ${global.currencySymbol}20 lac for 72 months EMI',
@@ -132,10 +150,6 @@ class HomeScreen2 extends BaseRoute {
 
   ] ;
 
-
-  //a - analytics
-  //o - observer
-  HomeScreen2({ a, o}) : super(a: a, o: o, r: 'HomeScreen2');
   List<Widget> banners(context) {
     List<Widget> list = [];
     try {
@@ -175,6 +189,7 @@ class HomeScreen2 extends BaseRoute {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,8 +222,7 @@ class HomeScreen2 extends BaseRoute {
                     icon: FaIcon(FontAwesomeIcons.bell),
                     onPressed: () {
                       Get.to(() => NotificationScreen(
-                            a: a,
-                            o: o,
+                          
                           ));
                     }),
                 Positioned(
@@ -341,8 +355,7 @@ class HomeScreen2 extends BaseRoute {
                                       onTap: () {
                                         if (index == 0) {
                                            Get.to(() => (EmiCalculatorScreen(
-                                                a: a,
-                                                o: o,
+                                             
                                                 )));
                                         } 
                                         
@@ -455,8 +468,9 @@ class HomeScreen2 extends BaseRoute {
 
 
               // Data Status 
-        if( role == UserRole.banker)      // condition for banker
-               SingleChildScrollView(
+            // condition for banker
+            if(UserRole == "Banker")
+                 SingleChildScrollView(
                   child: Card(
                     shadowColor: Color(0xFFC63437) ,
                     elevation: 3,
@@ -491,15 +505,13 @@ class HomeScreen2 extends BaseRoute {
                                       onTap: () {
                                         if (index == 0) {
                                            Get.to(() => (LeadListScreen(
-                                                a: a,
-                                                o: o,
+                                               
                                                 )));
                                         } 
                                         
                                         else if (index == 1) {
-                                           Get.to(() => (LoanApplicationScreen(
-                                                a: a,
-                                                o: o,
+                                           Get.to(() => (CommonLoanForm(
+                                               
                                                 )));
                                         }                
                                         
@@ -577,15 +589,12 @@ class HomeScreen2 extends BaseRoute {
                                                     overflow: TextOverflow.visible, 
                                                   ),
                                                 ),
-
-                                         ),
-
-                                                   
-                                        ],
-                                      ),
+                                         ),                                                   
+                                      ],
+                                   ),
                   
-                                    )
-                                  ),
+                              )
+                            ),
                           ),
                         ),
                       ],
@@ -628,15 +637,17 @@ SingleChildScrollView(
                 onTap: () {
                   // Handle onTap
                   if (index == 0) {
-                    // Action for first item
+                    Get.to(()=> CommonLoanForm()) ;
+
                   } else if (index == 1) {
-                    // Get.delete<PersonalLoanController>();
-                    // Get.to(() => BasicDetailEntryPLScreen(a: a, o: o));
+                        Get.to(()=> CommonLoanForm()) ;
+
                   } else if (index == 2) {
-                    // Get.delete<BusinessLoanController>();
-                    // Get.to(() => ChooseScreenBLScreen(a: a, o: o));
+                      Get.to(()=> CommonLoanForm()) ;
+
                   } else if (index == 3) {
-                    // Additional actions for other items
+                        Get.to(()=> CommonLoanForm()) ;
+
                   }
                 },
                 child: Column(
@@ -701,13 +712,11 @@ SingleChildScrollView(
 
       // Check Cibil // removed 
 
-        // Car Loan 
+      // Car Loan 
 
        SingleChildScrollView(
                   child: Card(
-                    shadowColor: Color(0xFFC63437) ,
-                    elevation: 3,
-                      
+                    color:  Color(0xFFC63437) ,
                     margin: EdgeInsets.only(top: 0 , bottom: 15 ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -719,7 +728,7 @@ SingleChildScrollView(
                             'Car Loan',
                             style: TextStyle(
                                 fontSize: 16,
-                                color: Color(0xFFC63437) ,
+                                color: Colors.white ,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -737,29 +746,28 @@ SingleChildScrollView(
                                 (index) => GestureDetector(
                                       onTap: () {
                                         if (index == 0) {
-                                          //  Get.to(() => (LeadListScreen(
-                                          //       a: a,
-                                          //       o: o,
-                                          //       )));
+                                           Get.to(()=> CommonLoanForm()) ;
+
                                         } 
                                         
                                         else if (index == 1) {
-                                          //  Get.to(() => (LoanApplicationScreen(
-                                          //       a: a,
-                                          //       o: o,
-                                          //       )));
+                                            Get.to(()=> CommonLoanForm()) ;
+
                                         }                
                                         
                                         else if (index == 2) {
-                                          
+                                            Get.to(()=> CommonLoanForm()) ;
+
 
                                         } 
                                         else if (index == 3) {
+                                              Get.to(()=> CommonLoanForm()) ;
 
                                         } 
                                         
                                         else if (index == 4) {
-                                          
+                                            Get.to(()=> CommonLoanForm()) ;
+
                                         } 
                
                                       },
@@ -776,7 +784,7 @@ SingleChildScrollView(
                                               decoration: BoxDecoration(
                                                   color: Colors.white ,
                                                   border: Border.all(
-                                                    color: Color(0xFFC63437) ,
+                                                    color: Colors.grey.shade500 ,
                                                     width: 2 ,
                                                   ),
                                                   borderRadius: BorderRadius.all(
@@ -817,7 +825,7 @@ SingleChildScrollView(
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 12,  
-                                                      color: Color(0xFFC63437) ,
+                                                      color: Colors.white ,
                                                       fontWeight: FontWeight.w600  ,
                                                     ),
                                                     maxLines: 2, 
@@ -839,7 +847,6 @@ SingleChildScrollView(
 
           // Property Loan 
 
-          
 SingleChildScrollView(
   child: Card(
     color: Color(0xFFC63437),  // Applying custom color
@@ -873,15 +880,18 @@ SingleChildScrollView(
                   // Handle onTap
                   if (index == 0) {
                     // Action for first item
-                  } else if (index == 1) {
+                      Get.to(()=> CommonLoanForm()) ;
 
-                    // Get.delete<PersonalLoanController>();
-                    // Get.to(() => BasicDetailEntryPLScreen(a: a, o: o));
+                  } else if (index == 1) {
+                        Get.to(()=> CommonLoanForm()) ;
+
+                  
                   } else if (index == 2) {
-                    // Get.delete<BusinessLoanController>();
-                    // Get.to(() => ChooseScreenBLScreen(a: a, o: o));
+                      Get.to(()=> CommonLoanForm()) ;
+
                   } else if (index == 3) {
-                    // Additional actions for other items
+                      Get.to(()=> CommonLoanForm()) ;
+
                   }
                 },
                 child: Column(
@@ -951,11 +961,6 @@ SingleChildScrollView(
         ));
   }
 
-
-
-
-
-
   Widget loanCardlist(context) {
     return ListView.builder(
         itemCount: 6,
@@ -1004,35 +1009,29 @@ SingleChildScrollView(
                             voidCallback: () {
                               if (index == 0) {
                                 Get.to(() => BasicDetailEntryPLScreen(
-                                      a: a,
-                                      o: o,
+                                     
                                     ));
                               } else if (index == 1) {
                                 Get.to(() => ChooseScreenBLScreen(
-                                      a: a,
-                                      o: o,
+                                      
                                     ));
                               } else if (index == 2) {
                                 Get.delete<HomeLoanController>();
                                 Get.to(() => chooseScreenHLScreen(
-                                      a: a,
-                                      o: o,
+                                    
                                     ));
                               } else if (index == 3) {
                                 Get.delete<LoanAgainstPropertyController>();
                                 Get.to(() => chooseScreenLAPScreen(
-                                      a: a,
-                                      o: o,
+                                   
                                     ));
                               } else if (index == 4) {
                                 Get.to(() => OtherLoanScreen(
-                                      a: a,
-                                      o: o,
+                                    
                                     ));
                               } else if (index == 5) {
                                 Get.to(() => OtherServicesScreen(
-                                      a: a,
-                                      o: o,
+                                     
                                     ));
                               }
                             },
@@ -1066,8 +1065,5 @@ SingleChildScrollView(
 
         
   }
-
-
-
 }
 

@@ -1,12 +1,9 @@
 import 'package:credit_app/controllers/splashController.dart';
 import 'package:credit_app/views/Introduction/introduction_screen.dart';
-import 'package:credit_app/views/Login/register.dart';
-import 'package:credit_app/widget/baseRoute.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:credit_app/views/bottom_navigation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:win32/win32.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -29,7 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
       
       if (isLoggedIn) {
         // User is already logged in, navigate to BottomNavigationScreen
-        Get.off(() => BottomNavigationScreen());
+        Get.offAll(() => BottomNavigationScreen());
+        // changed to off all 18/09
       } else {
         // User is not logged in, navigate to IntroductionScreen1
         Get.off(() => IntroductionScreen1());
