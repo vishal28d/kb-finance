@@ -92,6 +92,8 @@ dependencies {
     // Firebase Analytics (optional, replace with other Firebase products as needed)
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.android.gms:play-services-base:18.0.1' // Add or update this
+    implementation 'com.google.firebase:firebase-appcheck-playintegrity'
+    implementation 'com.google.firebase:firebase-storage'
 
 
 

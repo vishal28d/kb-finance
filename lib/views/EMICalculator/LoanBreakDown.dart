@@ -22,7 +22,7 @@ class LoanBreakdownWidget extends StatelessWidget {
     double principalLoanAmountPercentage = loanAmount / totalPayment * 100;
     double totalInterestPercentage = totalInterestPayable / totalPayment * 100;
 
-    double effectiveInterestRatePerYear = effectiveRatePerYear(annualInterestRate , 12);
+    double effectiveInterestRatePerYear = effectiveRatePerYear(totalInterestPayable);
 
     // Define the custom color
     Color customTextColor = Color(0xFF16423C);
@@ -126,7 +126,10 @@ class LoanBreakdownWidget extends StatelessWidget {
     return emi;
   }
 
-  double effectiveRatePerYear(double nominalRate, int numberOfCompoundingPeriods) {
-    return pow((1 + (nominalRate / (numberOfCompoundingPeriods * 100))), numberOfCompoundingPeriods) - 1;
+  double effectiveRatePerYear(double totalInterestPayable) {
+    return (totalInterestPayable *100) / (loanAmount * tenure/12) ;
+
   }
+
+
 }

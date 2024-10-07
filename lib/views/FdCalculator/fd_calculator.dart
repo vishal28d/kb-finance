@@ -7,7 +7,12 @@ import 'package:get/get.dart';
 import 'package:credit_app/controllers/fd_calculator_controller.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
-class FixedDepositCalculator extends StatelessWidget {
+class FixedDepositCalculator extends StatefulWidget {
+  @override
+  State<FixedDepositCalculator> createState() => _FixedDepositCalculatorState();
+}
+
+class _FixedDepositCalculatorState extends State<FixedDepositCalculator> {
   final FixedDepositController controller = Get.put(FixedDepositController());
 
   var update = 0.obs;
@@ -115,7 +120,10 @@ class FixedDepositCalculator extends StatelessWidget {
                 child: PrimaryTextButton(
                   text: "Calculate",
                   voidCallback: () {
+                    setState(() {
                     controller.calculateMaturityAmount();
+                    });
+                  
                   },
                 ),
               ),

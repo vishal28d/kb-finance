@@ -9,7 +9,13 @@ import 'package:credit_app/views/AffordableEMiCalculator/AffordableEmiCalculator
 import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
 import 'package:credit_app/views/EMICalculator/emi_calculator_screen.dart';
 import 'package:credit_app/views/FdCalculator/fd_calculator.dart';
+import 'package:credit_app/views/Home/commercialVehicleLoan.dart';
+import 'package:credit_app/views/Home/industrialLoan.dart';
+import 'package:credit_app/views/Home/learnWithKB.dart';
+import 'package:credit_app/views/Home/otherLoans.dart';
+import 'package:credit_app/views/Leads/add_lead_screen.dart';
 import 'package:credit_app/views/LoanApplications/loan_application_screen.dart';
+import 'package:credit_app/views/ProfessionalLoan/professionalLoan.dart';
 import 'package:credit_app/views/SimpleCalculator.dart/readymade_calculator.dart';
 import 'package:credit_app/views/Leads/lead_screen.dart';
 import 'package:credit_app/views/Notifications/notification_screen.dart';
@@ -48,13 +54,16 @@ class _HomeScreen2State extends State<HomeScreen2> {
   CarouselSliderController? carouselController;
 
   String UserRole = 'Customer' ; 
+  String displayName = "Guest" ;
 
   Future<void> setUserRole() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
       UserRole = prefs.getString('UserRole') ?? 'Customer'; 
+      displayName = prefs.getString('name') ?? 'Guest';
       });
       print(UserRole);
+      
 }
 
   @override
@@ -150,6 +159,23 @@ class _HomeScreen2State extends State<HomeScreen2> {
 
   ] ;
 
+  List<String> carLoanIcons = [
+    'assets/new-car-loan.png',
+    'assets/used-car-loan.png',
+    'assets/car-refinance.png',
+    'assets/car-loan-transfer.png',
+
+  ] ;
+
+  List<String> propertyLoanIcons = [
+      'assets/property-loan.png' ,
+      'assets/mortageLoan.png' ,
+      'assets/commercialPurchase.png' ,
+      'assets/commercialMortage.png' ,
+
+  ];
+
+
   List<Widget> banners(context) {
     List<Widget> list = [];
     try {
@@ -211,7 +237,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
               )),
               Padding(
                 padding: EdgeInsets.only(left: 10.0),
-                child: Text('Hi Guest'),
+                child: Text('Hi $displayName'),
               ),
             ],
           ),
@@ -472,9 +498,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
             if(UserRole == "Banker")
                  SingleChildScrollView(
                   child: Card(
-                    shadowColor: Color(0xFFC63437) ,
-                    elevation: 3,
-                      
+                    color: Color(0xFFC63437) ,
+                   
                     margin: EdgeInsets.only(top: 0 , bottom: 15 ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,7 +511,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                             'Data Status',
                             style: TextStyle(
                                 fontSize: 16,
-                                color: Color(0xFFC63437) ,
+                                color: Colors.white ,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -510,7 +535,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                         } 
                                         
                                         else if (index == 1) {
-                                           Get.to(() => (CommonLoanForm(
+                                           Get.to(() => (AddLeadScreen(onRefresh: (){},
                                                
                                                 )));
                                         }                
@@ -541,8 +566,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                               decoration: BoxDecoration(
                                                   color: Colors.white ,
                                                   border: Border.all(
-                                                    color: Color(0xFFC63437) ,
-                                                    width: 2 ,
+                                                    color: Colors.grey.shade500 ,
+                                            
                                                   ),
                                                   borderRadius: BorderRadius.all(
                                                       Radius.circular(15)
@@ -582,7 +607,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 12,  
-                                                      color: Color(0xFFC63437) ,
+                                                      color: Colors.white ,
                                                       fontWeight: FontWeight.w600  ,
                                                     ),
                                                     maxLines: 2, 
@@ -646,7 +671,7 @@ SingleChildScrollView(
                       Get.to(()=> CommonLoanForm()) ;
 
                   } else if (index == 3) {
-                        Get.to(()=> CommonLoanForm()) ;
+                        Get.to(()=> ProfessionalLoanForm()) ;
 
                   }
                 },
@@ -799,11 +824,12 @@ SingleChildScrollView(
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     Container(
-                                                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                                                        width: 32 ,
-                                                        child: SvgPicture.asset(
-                                                          iconList[index],                                                     
+                                                      padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                                        width: 70 ,
+                                                        child: Image.asset(
+                                                         carLoanIcons[index] ,                                                      
                                                           height: 45 ,
+                                                          width: 45 ,
                                                           // color: colors[index],
                                                           // ignore: deprecated_member_use
                                                           color: Color(0xFFC63437) ,
@@ -913,11 +939,12 @@ SingleChildScrollView(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                              padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                               width: 32,
-                              child: SvgPicture.asset(
-                                iconList[index],
+                              child: Image.asset(
+                                propertyLoanIcons[index] ,
                                 height: 45,
+                                width: 45,
                                 // ignore: deprecated_member_use
                                 color: Color(0xFFC63437),
                               ),
@@ -953,6 +980,12 @@ SingleChildScrollView(
   ),
 ),
       
+       
+
+        CommercialVehicleLoan() ,
+        IndustrialLoan(),
+        OtherLoansAndCreditCard() ,
+        LearnWithKb() ,
 
 
               ],

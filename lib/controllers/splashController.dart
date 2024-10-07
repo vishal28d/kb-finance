@@ -18,7 +18,7 @@ class SplashController extends GetxController {
 
   _init() {
     Timer(Duration(seconds: 3), () {
-      Get.off(() => IntroductionScreen1(), routeName: "CustomerListScreen");
+      // Get.off(() => IntroductionScreen1(), routeName: "CustomerListScreen");
     });
   }
 }

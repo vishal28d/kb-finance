@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:credit_app/constants/listOfBanks.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,14 +9,66 @@ class BankerFormController extends GetxController {
   var fullNameController = TextEditingController();
   var emailController = TextEditingController();
   var pincodeController = TextEditingController();
+  var bankTextController = TextEditingController();
 
   // Observable variables for dropdown selections
-  var selectedBank = ''.obs;
   var selectedState = ''.obs;
   var selectedDistrict = ''.obs;
 
+  var filteredBanks = <String>[].obs;
+  var selectedBank = ''.obs;
+
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+Future<void> insertBankersDetail() async {
+  try {
+    // Collecting values from controllers and observables
+    String designation = designationController.text.trim();
+    String fullName = fullNameController.text.trim();
+    String email = emailController.text.trim();
+    String pincode = pincodeController.text.trim();
+    String bank = selectedBank.trim();
+    
+    String state = selectedState.value;
+    String district = selectedDistrict.value;
+    String selectedBankValue = selectedBank.value;
+
+    // Check if all required fields are filled before inserting
+    if (designation.isEmpty || fullName.isEmpty || email.isEmpty || pincode.isEmpty || 
+        state.isEmpty || district.isEmpty || selectedBankValue.isEmpty) {
+      Get.snackbar('Error', 'Please fill in all the required fields');
+      return;
+    }
+
+    // Prepare the data to be inserted as a map
+    Map<String, dynamic> bankersDetailData = {
+      'designation': designation,
+      'fullName': fullName,
+      'email': email,
+      'pincode': pincode,
+      'bank': bank,
+      'state': state,
+      'district': district,
+      'selectedBank': selectedBankValue,
+      'createdAt': FieldValue.serverTimestamp(),  
+    };
+
+    // Insert the data into the 'bankersDetail' collection
+    await _firestore.collection('bankersDetail').add(bankersDetailData);
+
+    // If successful, show a success message
+    Get.snackbar('Success', 'Bankers detail added successfully!', backgroundColor: Colors.green[400]);
+  } catch (e) {
+    // In case of an error, show an error message
+    Get.snackbar('Error', 'Failed to add bankers detail: $e');
+  }
+}
+
+
+
   // Lists for dropdown options
-  List<String> banks = [
+  List<String> ListOfAllBankss = [
     'Andhra Pradesh Grameena Vikas Bank',
     'Andhra Pragathi Grameena Bank',
     'American Express Bank',
@@ -145,6 +199,51 @@ List<String> nbfc = [
   }.obs;
 
 
+  int binarySearch(List<String> sortedList, String query) {
+  int low = 0;
+  int high = sortedList.length - 1;
+
+  while (low <= high) {
+    int mid = (low + high) ~/ 2;
+    String midValue = sortedList[mid].toLowerCase();
+
+    if (midValue.startsWith(query.toLowerCase())) {
+      // Found a match, return the starting index
+      return mid;
+    } else if (midValue.compareTo(query.toLowerCase()) < 0) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return -1; // No match found
+}
+
+
+List<String> ListOfAllBanks = ListOfBanks().ListOfBank ;
+
+
+ void filterBanks(String query) {
+  // Sort the banks list first if not already sorted
+ 
+  int startIndex = binarySearch(ListOfAllBanks, query);
+
+  // If a match is found, filter banks starting from the matched index
+  if (startIndex != -1) {
+    List<String> matchedBanks = [];
+    for (int i = startIndex; i < ListOfAllBanks.length; i++) {
+      if (ListOfAllBanks[i].toLowerCase().startsWith(query.toLowerCase())) {
+        matchedBanks.add(ListOfAllBanks[i]);
+      } else {
+        break; // Stop once banks no longer match the query
+      }
+    }
+    filteredBanks.value = matchedBanks;
+  } else {
+    filteredBanks.value = []; // No matches found
+  }
+}
+
 
   // Validation for form submission
   bool isFormValid() {
@@ -166,4 +265,7 @@ List<String> nbfc = [
     selectedState.value = '';
     selectedDistrict.value = '';
   }
+
+
+
 }

@@ -2,6 +2,7 @@
 import 'package:credit_app/l10n/l10n.dart';
 import 'package:credit_app/provider/local_provider.dart';
 import 'package:credit_app/theme/nativeTheme.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -26,6 +27,7 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseAppCheck.instance.activate( androidProvider: AndroidProvider.playIntegrity,);
   runApp(ChangeNotifierProvider(
     create: (_) => LocaleProvider(),
     child: MyApp(),

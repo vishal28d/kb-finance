@@ -1,11 +1,9 @@
-//flutter
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 //packages
 import 'package:get/get.dart';
 //models
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageControlller extends GetxController {
@@ -35,22 +33,8 @@ class ImageControlller extends GetxController {
     try {
       final ImagePicker _picker = ImagePicker();
       XFile? _selectedImage = await _picker.pickImage(source: imageSource);
-      imageFile = File(_selectedImage!.path);
-      // if (_selectedImage != null) {
-      File? croppedFile = await ImageCropper.cropImage(
-        sourcePath: _selectedImage.path,
-        androidUiSettings: AndroidUiSettings(
-          initAspectRatio: CropAspectRatioPreset.ratio4x3,
-          backgroundColor: Colors.grey,
-          toolbarColor: Colors.grey[100],
-          toolbarWidgetColor: Colors.blue[200],
-          activeControlsWidgetColor: Colors.blue[200],
-          cropFrameColor: Colors.blue[200],
-        ),
-      );
-
-      if (croppedFile != null) {
-        imageFile = croppedFile;
+      if (_selectedImage != null) {
+        imageFile = File(_selectedImage.path);
         List<int> imageBytes = imageFile!.readAsBytesSync();
         print(imageBytes);
         imagePath.value = base64Encode(imageBytes);
@@ -58,9 +42,8 @@ class ImageControlller extends GetxController {
 
         return imageFile!;
       }
-      // }
     } catch (e) {
-      print("Exception - businessRule.dart - _openGallery()" + e.toString());
+      print("Exception - imageService()" + e.toString());
     }
     return null;
   }

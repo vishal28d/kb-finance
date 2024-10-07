@@ -39,8 +39,8 @@ class _LeadListScreenState extends State<LeadListScreen> {
    leadData = fetchLeads() ;
    });
   super.initState();
-
   }
+
 
   Future<void> deleteLead(String documentId) async {
     try {
@@ -89,8 +89,14 @@ class _LeadListScreenState extends State<LeadListScreen> {
     Get.snackbar('Error', 'Phone Call permission not granted' , backgroundColor: Colors.red[400]) ;
   }
 }
+ 
+   refreshLeadScreen(){
+    setState(() {
+        leadData = fetchLeads();
+    });
+  }
 
-      
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,6 +105,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
         leading: IconButton(
           onPressed: () {
             Get.back();
+
           },
           icon: Icon(
             Icons.arrow_back_ios,
@@ -113,7 +120,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
           IconButton(
             onPressed: () {
               Get.to(() => (AddLeadScreen(
-                   
+                  onRefresh: refreshLeadScreen ,
                   )));
             },
             icon: Icon(
@@ -138,6 +145,31 @@ class _LeadListScreenState extends State<LeadListScreen> {
     );
   }
 
+  String extractDetail(List details, int index, {String defaultValue = 'N/A', bool isDate = false}) {
+  if (details.length > index) {
+    String value = details[index].toString().split(': ')[1];
+    if (isDate) {
+      try {
+        return DateFormat('dd/MM/yyyy').format(DateTime.parse(value));
+      } catch (e) {
+        return defaultValue; 
+      }
+    }
+    return value;
+  }
+  return defaultValue;
+}
+
+
+    String _formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('dd/MM/yyyy').format(date);
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+
 
 Widget leadList(BuildContext context) {
   return FutureBuilder<List<Map<String, dynamic>>>(
@@ -147,37 +179,33 @@ Widget leadList(BuildContext context) {
         return Center(child: CircularProgressIndicator());
       } else if (snapshot.hasError) {
         return Center(child: Text('Error fetching leads: ${snapshot.error}'));
-      } else if (snapshot.hasData && loginEmail != null) {
-        // Filter the leads where createdby == loginEmail
-        List<Map<String, dynamic>> leadList = snapshot.data!
-            .where((lead) {
-              List<dynamic> details = lead['details'] ?? [];
-              String createdby = details.length > 11 ? details[11].toString().split(': ')[1] : '';
-              return createdby == loginEmail;
-            })
-            .toList();
+      } else if (snapshot.hasData) {
+        // Filter the list based on 'Created By' == loginEmail
+        List<Map<String, dynamic>> leadList = snapshot.data!.where((lead) {
+          return lead['Created By'] == loginEmail;
+        }).toList();
 
         if (leadList.isEmpty) {
-          return Center(child: Text('No leads found for the current user.' , style: TextStyle(color: Colors.black),));
+          return Center(child: Text('No leads found.', style: TextStyle(color: Colors.black)));
         }
 
         return ListView.builder(
           itemCount: leadList.length,
           itemBuilder: (context, index) {
             Map<String, dynamic> lead = leadList[index];
+            
+            // Extract details for each lead
+            String fullName = lead['Full Name'] ?? 'n/a';
+            String mobileNo = lead['Mobile No'] ?? 'n/a';
+            String loanAmount = lead['Loan Amount'] ?? 'n/a';
+            String loanType = lead['Loan Type'] ?? 'n/a';
+            String leadCode = lead['LeadID'] ?? 'n/a';
+            String startDate = lead['Start Date'] ?? 'n/a';
+            String pickedTime = lead['Picked Time'] ?? 'n/a';
+            String pickedDate = lead['Start Date'] ?? 'n/a';
+            String documentId = lead['id'] ?? 'n/a';
 
-            List<dynamic> details = lead['details'] ?? [];
-            Timestamp createdAt = lead['createdAt'];
-            DateTime createdAtDate = createdAt.toDate();
-            String fullName = details.isNotEmpty ? details[0].toString().split(': ')[1] : 'N/A';
-            String loanType = details.length > 5 ? details[5].toString().split(': ')[1] : 'N/A';
-            String mobileNo = details.length > 1 ? details[1].toString().split(': ')[1] : 'N/A';
-            String loanAmount = details.length > 3 ? details[3].toString().split(': ')[1] : 'N/A';
-            String leadCode = details.length > 9 ? details[9].toString().split(': ')[1] : 'N/A';
-            String documentId = lead['id'] ?? 'N/A';
-            String startDate = details.length > 10
-                ? DateFormat('dd/MM/yyyy').format(DateTime.parse(details[10].toString().split(': ')[1]))
-                : 'N/A';
+            pickedDate = _formatDate(pickedDate);
 
             return Container(
               margin: EdgeInsets.only(top: 0, bottom: 8),
@@ -188,128 +216,96 @@ Widget leadList(BuildContext context) {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(right: 10, left: 10, bottom: 10, top: 10),
+                      padding: EdgeInsets.all(10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  leadCode,
-                                  style: Theme.of(context).textTheme.headlineSmall,
-                                ),
-                                Text(
-                                  startDate,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ],
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                leadCode,
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              Text(
+                                '${pickedDate} - $pickedTime',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
                           ),
                           DottedDivider(),
-                          Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  fullName,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                Text(
-                                  loanType,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ],
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(fullName, style: Theme.of(context).textTheme.bodyLarge),
+                              Text(loanType, style: Theme.of(context).textTheme.bodyLarge),
+                            ],
                           ),
                           DottedDivider(),
-                          Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  mobileNo,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                Text(
-                                  '${global.currencySymbol} $loanAmount',
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ],
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(mobileNo, style: Theme.of(context).textTheme.bodyLarge),
+                              Text('${global.currencySymbol} $loanAmount', style: Theme.of(context).textTheme.bodyLarge),
+                            ],
                           ),
                           DottedDivider(),
-                          Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                LeadScreenElevatedButton(
-                                  child: Text('Call'),
-                                  voidCallback: () {
-                                    makePhoneCall(mobileNo);
-                                  },
-                                ),
-                                LeadScreenElevatedButton(
-                                  voidCallback: () async {
-                                    await Get.to(() => LeadDetailScreen(lead: lead));
-                                  },
-                                  child: Text('View'),
-                                ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              LeadScreenElevatedButton(
+                                child: Text('Call'),
+                                voidCallback: () {
+                                  makePhoneCall(mobileNo);
+                                },
+                              ),
+                              LeadScreenElevatedButton(
+                                child: Text('View'),
+                                voidCallback: () async {
+                                  await Get.to(() => LeadDetailScreen(lead: lead));
+                                },
+                              ),
+                              LeadScreenElevatedButton(
+                                child: Text('Edit'),
+                                voidCallback: () async {
+                                  await Get.to(() => EditLeadScreen(documentId: documentId, onRefresh: refreshLeadScreen));
+                                },
+                              ),
+                              LeadScreenElevatedButton(
+                                child: Text('Delete'),
+                                voidCallback: () async {
+                                  bool? confirmDelete = await Get.dialog<bool>(
+                                    AlertDialog(
+                                      title: Text('Confirm Delete'),
+                                      content: Text('Are you sure you want to permanently delete this lead?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Get.back(result: false),
+                                          child: Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                                          onPressed: () => Get.back(result: true),
+                                          child: Text('Delete'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
 
-                                LeadScreenElevatedButton(
-                                  voidCallback: () async {
-                                    await Get.to(() => EditLeadScreen(documentId: documentId ,));
-                                  },
-                                  child: Text('Edit'),
-                                ),
-                                
-                                LeadScreenElevatedButton(
-                                  child: Text('Delete'),
-                                  voidCallback: () async {
-                                    bool? confirmDelete = await Get.dialog<bool>(
-                                      AlertDialog(
-                                        title: Text('Confirm Delete'),
-                                        content: Text('Are you sure you want to permanently delete this lead?'),
-                                        actions: [
-                                          TextButton(
-                                            style: ButtonStyle(backgroundColor:  WidgetStateProperty.all(Colors.red)),                              
-                                            onPressed: () {
-                                              Get.back(result: false);
-                                            },
-                                            child: Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                             style: ButtonStyle(backgroundColor:  WidgetStateProperty.all(Colors.red)),                              
-                                            onPressed: () {
-                                              Get.back(result: true);
-                                            },
-                                            child: Text('Delete'),
-                                          ),
-                                        ],
-                                      ),
+                                  if (confirmDelete == true) {
+                                    await deleteLead(documentId);
+                                    Get.snackbar(
+                                      'Success',
+                                      'Lead deleted successfully',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.green,
+                                      colorText: Colors.white,
+                                      duration: Duration(seconds: 2),
                                     );
-
-                                    if (confirmDelete == true) {
-                                      await deleteLead(documentId);
-
-                                      Get.snackbar(
-                                        'Success',
-                                        'Lead deleted successfully',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: Colors.green,
-                                        colorText: Colors.white,
-                                        duration: Duration(seconds: 2),
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
+                                  }
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -321,11 +317,12 @@ Widget leadList(BuildContext context) {
           },
         );
       } else {
-        return Center(child: Text('No data found.', style: TextStyle(color: Colors.black),));
+        return Center(child: Text('No data found.', style: TextStyle(color: Colors.black)));
       }
     },
   );
 }
+
 
 
 }
