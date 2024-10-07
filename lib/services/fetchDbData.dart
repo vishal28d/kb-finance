@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 Future<List<Map<String, dynamic>>> fetchLeads() async {
   try {
@@ -19,23 +20,29 @@ Future<List<Map<String, dynamic>>> fetchLeads() async {
       }).toList();
     }
 
-    // Function to extract 'Start Date' from 'details' array
-    DateTime extractStartDate(Map<String, dynamic> lead) {
-      final details = lead['details'] as List<dynamic>;
-      final startDateString = details.firstWhere(
-        (detail) => detail.startsWith('Start Date: '),
-        orElse: () => 'Start Date: 1970-01-01 00:00:00.000',
-      ).substring('Start Date: '.length);
-      
-      return DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(startDateString);
-    }
 
-    // Sort leads by 'Start Date'
+    // Function to extract 'Start Date' from 'details' array
+   DateTime extractStartDate(Map<String, dynamic> lead) {
+  // Get 'Start Date' directly from the lead data
+  final startDateString = lead['Start Date'] as String?;
+
+  if (startDateString == null || startDateString.isEmpty) {
+    // Provide a default date if 'Start Date' is not available
+    return DateTime(1970, 1, 1);
+  }
+
+  // Parse the Start Date string
+  return DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(startDateString);
+}
+
+
+    // Sort leads by 'Start Date' (earliest date first)
     leads.sort((a, b) {
       DateTime dateA = extractStartDate(a);
       DateTime dateB = extractStartDate(b);
+      print('$dateA -- $dateB') ;
 
-      return dateA.compareTo(dateB); // increasing order
+      return dateA.compareTo(dateB); // Ascending order
     });
 
     print(leads);

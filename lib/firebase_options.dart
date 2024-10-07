@@ -67,8 +67,8 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA9VatF2RSqaWSx4bbId6OvGBSDfdkil1A',
-    appId: '1:854600484014:ios:1492cd3af2e47efcfed93f',
+    apiKey: 'AIzaSyASHfzm72_vlKAgC-RcVTgerZDF1MkSqcc',
+    appId: '1:854600484014:android:b46248d71cdf5595fed93f',
     messagingSenderId: '854600484014',
     projectId: 'kb-finance-app',
     databaseURL: 'https://kb-finance-app-default-rtdb.firebaseio.com',

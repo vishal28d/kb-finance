@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:credit_app/controllers/emi_calculator_controller.dart';
+import 'package:credit_app/theme/nativeTheme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:get/get.dart';
 import 'dart:math'; // For interest calculations
 import 'package:intl/intl.dart'; // For formatting dates
 import 'package:pdf/pdf.dart'; // For PDF generation
 import 'package:pdf/widgets.dart' as pw; // For PDF widgets
+import 'package:permission_handler/permission_handler.dart';
 import 'package:printing/printing.dart'; // For PDF printing and sharing
 import 'dart:io'; // For file operations
 import 'package:path_provider/path_provider.dart'; // For accessing device directories
@@ -18,158 +21,153 @@ class RepaymentScheduleTable extends StatefulWidget {
    double loanAmount;
    double annualInterestRate;
    double loanTermMonths;
+   double emiResult;
 
   RepaymentScheduleTable({
     required this.loanAmount,
     required this.annualInterestRate,
     required this.loanTermMonths,
+    required this.emiResult,
   });
 
   @override
   _RepaymentScheduleTableState createState() => _RepaymentScheduleTableState();
 }
 
+
 class _RepaymentScheduleTableState extends State<RepaymentScheduleTable> {
+
+  final EmiCalculatorController emiCalculatorController = Get.put(EmiCalculatorController()) ;
   
-   List<Map<String, dynamic>> repaymentSchedule = [];
+  
    late DateTime startDate;
+   
   
   @override
   void initState() {
-    super.initState();
     startDate = DateTime.now();
-    initializeRepaymentSchedule();
-  }
-
-
-  Future<void> initializeRepaymentSchedule() async {
-    List<Map<String, dynamic>> schedule = await generateRepaymentSchedule(
-
-      widget.loanAmount,
-      widget.annualInterestRate,
-      widget.loanTermMonths.toInt(),
+    emiCalculatorController.initializeRepaymentSchedule(
+    widget.loanAmount,
+    widget.annualInterestRate,
+    widget.loanTermMonths,
     );
 
-    if (mounted) {
-      setState(() {
-        repaymentSchedule = schedule;
-      });
-    }
+    setState(() {
+      widget.emiResult ;
+    });
+
+    super.initState();
+
   }
 
 
-  Future<List<Map<String, dynamic>>> generateRepaymentSchedule(
-      double loanAmount, double annualInterestRate, int loanTermMonths) async {
-    double monthlyInterestRate = annualInterestRate / 12 / 100;
-    double monthlyPayment = (loanAmount * monthlyInterestRate) /
-        (1 - pow(1 + monthlyInterestRate, -loanTermMonths));
 
-    double remainingBalance = loanAmount;
-    List<Map<String, dynamic>> schedule = [];
-
-    setState(() {});
-
-    for (int i = 0; i < loanTermMonths; i++) {
-      double interestPayment = remainingBalance * monthlyInterestRate;
-      double principalPayment = monthlyPayment - interestPayment;
-      remainingBalance -= principalPayment;
-
-      DateTime paymentDate = DateTime(
-        startDate.year,
-        startDate.month + i,
-        startDate.day,
-      );
-      String monthName = DateFormat('MMMM yyyy').format(paymentDate);
-
-      schedule.add({
-        'paymentNo': i + 1,
-        'paymentDate': monthName,
-        'beginningBalance': i == 0 ? loanAmount : schedule[i - 1]['endingBalance'],
-        'payment': monthlyPayment,
-        'principal': principalPayment,
-        'interest': interestPayment,
-        'endingBalance': max(remainingBalance, 0),
-      });
-    }
-
-    return schedule;
+  Future<void> requestStoragePermission() async {
+  var status = await Permission.storage.status;
+  if (!status.isGranted) {
+    await Permission.storage.request();
   }
+}
+
+
 
 Future<void> generateAndDownloadPDF() async {
   try {
+    emiCalculatorController.initializeRepaymentSchedule(
+        widget.loanAmount,
+    widget.annualInterestRate,
+    widget.loanTermMonths,
+    );
+   
     final pdf = pw.Document();
-    final data = repaymentSchedule;
+    final data = emiCalculatorController.repaymentSchedule ;
 
     // Load the logo image
     final logoImage = pw.MemoryImage(
       (await rootBundle.load('assets/logo4by1.png')).buffer.asUint8List(),
     );
 
+    // Load custom font
     final font = pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Black.ttf'));
+     
+    const rowsPerPage = 18; // Set the number of rows per page
+    int totalPages = (data.length / rowsPerPage).ceil(); // Calculate total pages
 
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              // Add the logo at the top in the center
-              pw.Center(
-                child: pw.Image(logoImage, width: 200, height: 50),
-              ),
-              pw.SizedBox(height: 00),
-              pw.Table(
-                border: pw.TableBorder.all(),
-                children: [
-                  pw.TableRow(
-                    children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('S.No.', style: pw.TextStyle(font: font)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Principal', style: pw.TextStyle(font: font)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Interest', style: pw.TextStyle(font: font)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text('Ending Balance', style: pw.TextStyle(font: font)),
-                      ),
-                    ],
-                  ),
-                  ...data.map(
-                    (row) => pw.TableRow(
+    for (int page = 0; page < totalPages; page++) {
+      final start = page * rowsPerPage;
+      final end = start + rowsPerPage > data.length ? data.length : start + rowsPerPage;
+
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) {
+            return pw.Column(
+              children: [
+                // Add the logo at the top in the center
+                pw.Center(
+                  child: pw.Image(logoImage, width: 150, height: 60),
+                ),
+                pw.SizedBox(height: 5),
+
+                if(page==0)
+                pw.Text('Loan Amount:Rs ${widget.loanAmount}, \t \t Interest Rate: ${widget.annualInterestRate}% , \nLoan Duration: ${widget.loanTermMonths} months, \t EMI : Rs ${widget.emiResult}' , style: pw.TextStyle(fontSize: 15, font: font) ),
+
+                pw.SizedBox(height: 10) ,
+                // Add the table for the current page
+                pw.Table(
+                  border: pw.TableBorder.all(),
+                  children: [
+                    pw.TableRow(
                       children: [
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(row['paymentNo'].toString(), style: pw.TextStyle(font: font)),
+                          child: pw.Text('S.No.', style: pw.TextStyle(font: font)),
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(row['principal'].toStringAsFixed(2), style: pw.TextStyle(font: font)),
+                          child: pw.Text('Principal', style: pw.TextStyle(font: font)),
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(row['interest'].toStringAsFixed(2), style: pw.TextStyle(font: font)),
+                          child: pw.Text('Interest', style: pw.TextStyle(font: font)),
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(row['endingBalance'].toStringAsFixed(2), style: pw.TextStyle(font: font)),
+                          child: pw.Text('Ending Balance', style: pw.TextStyle(font: font)),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
+                    ...data.sublist(start, end).map(
+                      (row) => pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(row['paymentNo'].toString(), style: pw.TextStyle(font: font)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(row['principal'].toStringAsFixed(2), style: pw.TextStyle(font: font)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(row['interest'].toStringAsFixed(2), style: pw.TextStyle(font: font)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(row['endingBalance'].toStringAsFixed(2), style: pw.TextStyle(font: font)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    }
 
+    // Save the PDF file locally
     await _savePDFLocally(pdf);
 
   } catch (e) {
@@ -178,11 +176,18 @@ Future<void> generateAndDownloadPDF() async {
   }
 }
 
+
     // share pdf fucntion 
  Future<void> _sharePDF() async {
   try {
+   emiCalculatorController.initializeRepaymentSchedule(
+      widget.loanAmount,
+    widget.annualInterestRate,
+    widget.loanTermMonths,
+   );
+   
     final pdf = pw.Document();
-    final data = repaymentSchedule;
+    final data = emiCalculatorController.repaymentSchedule;
 
     // Load the font and logo
     final font = pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Black.ttf'));
@@ -204,9 +209,14 @@ Future<void> generateAndDownloadPDF() async {
               children: [
                 // Add logo at the top center
                 pw.Center(
-                  child: pw.Image(logoImage, width: 150, height: 100),
+                  child: pw.Image(logoImage, width: 140, height: 95),
                 ),
                 pw.SizedBox(height: 2), 
+
+                if(page==0)
+                pw.Text('Loan Amount: Rs ${widget.loanAmount}, \t \t Interest Rate: ${widget.annualInterestRate}% , \nLoan Duration: ${widget.loanTermMonths} months, \t EMI :Rs ${widget.emiResult}' , style: pw.TextStyle(fontSize: 15, font: font) ),
+
+                pw.SizedBox(height: 5) ,  
 
                 // Add the table
                 pw.Table(
@@ -273,22 +283,22 @@ Future<void> generateAndDownloadPDF() async {
   }
 }
 
-
+  
 Future<void> _savePDFLocally(pw.Document pdf) async {
   try {
-    // Get the path to the "Download" folder
-    final directory = await getExternalStorageDirectory();
-    String downloadsfolerPath = '/storage/emulated/0/Download';
-    final downloadPath = '${downloadsfolerPath}/repayment_schedule.pdf';
-    
-    // Create the "Download" directory if it doesn't exist
-    final downloadDir = Directory('${directory?.path}/Download');
-    if (!await downloadDir.exists()) {
-      await downloadDir.create(recursive: true);
-    }
-    
-    // Save the PDF file to the "Download" folder
+    await requestStoragePermission(); // Ensure permission is requested
+
+    // Generate a random 4-digit number
+    Random random = Random();
+    int randomNumber = 1000 + random.nextInt(9000); // Random number between 1000 and 9999
+
+    String downloadsFolderPath = '/storage/emulated/0/Download';
+    final downloadPath = '$downloadsFolderPath/repayment_schedule_$randomNumber.pdf';
+
+    // Create the File object for the PDF to be saved
     final file = File(downloadPath);
+
+    // Save the PDF file
     await file.writeAsBytes(await pdf.save());
 
     if (mounted) {
@@ -305,6 +315,7 @@ Future<void> _savePDFLocally(pw.Document pdf) async {
 }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -312,6 +323,7 @@ Future<void> _savePDFLocally(pw.Document pdf) async {
       
         SizedBox(height: 20),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
               onPressed: _sharePDF,
@@ -325,6 +337,8 @@ Future<void> _savePDFLocally(pw.Document pdf) async {
           ],
         ),
         SizedBox(height: 20),
+
+        Obx(()=>
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
@@ -337,7 +351,7 @@ Future<void> _savePDFLocally(pw.Document pdf) async {
               DataColumn(label: Text('Interest', style: TextStyle(color: Colors.black.withOpacity(0.5)))),
               DataColumn(label: Text('Balance', style: TextStyle(color: Colors.black.withOpacity(0.5)))),
             ],
-            rows: repaymentSchedule
+            rows: emiCalculatorController.repaymentSchedule
                 .map(
                   (repayment) => DataRow(
                     cells: [
@@ -351,6 +365,7 @@ Future<void> _savePDFLocally(pw.Document pdf) async {
                 .toList(),
           ),
         ),
+        ) ,
         SizedBox(height: 20),
        
       ],

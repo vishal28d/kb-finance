@@ -1,363 +1,337 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_app/controllers/edit_lead_controller.dart';
 import 'package:credit_app/controllers/lead_controller.dart';
-import 'package:credit_app/services/fetchDbData.dart';
-import 'package:credit_app/widget/appBarWidget.dart';
-import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
 import 'package:credit_app/widget/custom_dropdown.dart';
 import 'package:credit_app/widget/custom_textformfield.dart';
 import 'package:credit_app/widget/primary_button.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+class EditLeadScreen extends StatefulWidget {
+  final Function onRefresh;
+  var documentId;
 
-// ignore: must_be_immutable
-class EditLeadScreen extends BaseRoute {
-  //a - analytics
-  //o - observer
-  EditLeadScreen({a, o , required this.documentId}) : super(a: a, o: o, r: 'EditLeadScreen');
+  EditLeadScreen({required this.onRefresh, required  this.documentId});
 
-   final EditLeadController leadsController = Get.find<EditLeadController>();
-  // Firebase Instance 
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    
-      var documentId;
+  @override
+  State<EditLeadScreen> createState() => _EditLeadScreenState();
+}
+
+class _EditLeadScreenState extends State<EditLeadScreen> {
+  final EditLeadController leadsController = Get.find<EditLeadController>();
+
+  final TextStyle commonTextStyle = TextStyle(fontSize: 16.0, color: Colors.black);
+
+  void _confirmSubmit(var documentId) {
+  Get.defaultDialog(
+    title: 'Confirm Submission',
+    middleText: 'Are you sure you want to submit the lead details?',
+    onConfirm: () {
+      // Proceed with the submission
+      leadsController.updateLeadInFirestore(documentId);
+      widget.onRefresh();
+      Get.back(); // Close the dialog after submission\\\\\\\\\\\\
+    },
+    onCancel: () {
+      // Close the dialog without submitting
+      Get.back();
+    },
+    confirm: TextButton(
+      onPressed: () {
+      if(!leadsController.validateForm()) return ;
+      leadsController.updateLeadInFirestore(documentId);
+      widget.onRefresh();
+      Get.back(); 
+        
+      },
+      child: Text('Submit'),
+    ),
+    cancel: TextButton(
+      onPressed: () {
+        Get.back(); // Close the dialog
+      },
+      child: Text('Cancel'),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyCustomAppBar(
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            size: 20,
-          ),
-        ),
-        height: 80,
-        appbarPadding: 0,
-        title: Text('Edit Lead'),
+      appBar: AppBar(
+        title: Text('Edit Loan Follow-up Form'),
         centerTitle: true,
       ),
-      body: GetBuilder<EditLeadController>(
-          builder: (_) => (CommonPadding(
-                  child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Name',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              hintText: "Enter your full name",
-                              textEditingController: leadsController.fullname,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.text,
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(
-                                  leadsController.mobileno as FocusNode?,
-                                );
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Phone No',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              hintText: "Change mobile no",
-                              textEditingController: leadsController.mobileno,
-                              focusnode: leadsController.fmobileno,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.numberWithOptions(signed: true, decimal: true),
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(
-                                  leadsController.femail,
-                                );
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Email Id',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              hintText: "Change email address",
-                              textEditingController: leadsController.email,
-                              focusnode: leadsController.femail,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.text,
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(
-                                  leadsController.floanamount,
-                                );
-                              },
-                            ),
-                          ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Borrower Information
+            Text('Borrower Information', style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 5),
+            Text('Full Name', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter full name',
+              textEditingController: leadsController.fullname,
+            ),
+            SizedBox(height: 5),
+            Text('Phone Number', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter phone number',
+              textEditingController: leadsController.mobileno,
+            ),
+            SizedBox(height: 5),
+            Text('Alternate Phone Number', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter alternate phone number',
+              textEditingController: leadsController.alternateMobile,
+            ),
+
+            // Address Information
+            SizedBox(height: 20),
+            Text('Address Information', style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 5),
+
+        Text('Office Address', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 5),
+        Text('State', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter state', textEditingController: leadsController.stateOffice),
+        SizedBox(height: 5),
+        Text('City', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter city', textEditingController: leadsController.cityOffice),
+        SizedBox(height: 5),
+        Text('Pincode', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter pincode', textEditingController: leadsController.pincodeOffice),
+
+         Text('Residence Address', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 5),
+        Text('State', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter state', textEditingController: leadsController.stateResidence),
+        SizedBox(height: 5),
+        Text('City', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter city', textEditingController: leadsController.cityResidence),
+        SizedBox(height: 5),
+        Text('Pincode', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter pincode', textEditingController: leadsController.pincodeResidence),
+
+         Text('Permanent Address', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 5),
+        Text('State', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter state', textEditingController: leadsController.statePermanent),
+        SizedBox(height: 5),
+        Text('City', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter city', textEditingController: leadsController.cityPermanent),
+        SizedBox(height: 5),
+        Text('Pincode', style: commonTextStyle),
+        CustomTextFormField(hintText: 'Enter pincode', textEditingController: leadsController.pincodePermanent),
 
 
-                           Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Follow Up',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                                child: Obx(() => InkWell(
-                                  onTap: () async {
-                                    DateTime? pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: leadsController.pickedDate.value ,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2101),
-                                      );
-                                      if (pickedDate != null) {
-                                        leadsController.pickedDate.value= pickedDate; 
-                                      }
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        DateFormat('dd/MM/yyyy').format(leadsController.pickedDate.value),
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  )),
-                                ),
+            SizedBox(height: 5),
+            Text('Landmark', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter landmark',
+              textEditingController: leadsController.landmark,
+            ),
 
+            // Follow-up Details
+            SizedBox(height: 20),
+            Text('Follow-up Details', style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 5),
+            _buildDatePicker('Follow-up Date', leadsController.pickedDate ),
+            SizedBox(height: 5),
+            _buildTimePicker('Follow-up Time', leadsController.pickedTime ),
+            SizedBox(height: 5),
+            Text('Follow-up Status', style: commonTextStyle),
+            CustomDropDown(
+              hint: Text("Select Follow-up Status"),
+              list: leadsController.followUpStatusList,
+              val: leadsController.followUpStatus, // Use .value if using Rx
+              onChanged: (newValue) {
+                leadsController.followUpStatus = newValue; // Update value
+              },
+            ),
+            SizedBox(height: 5),
+            Text('Follow-up Comments', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter follow-up comments',
+              textEditingController: leadsController.followUpComments,
+            ),
 
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Employment Type',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(top: 8),
-                              child: CustomDropDown(
-                                hint: Text(
-                                  "Select employment",
-                                  style: Theme.of(context).inputDecorationTheme.hintStyle,
-                                ),
-                                list: leadsController.employmenttypelist,
-                                val: leadsController.employmenttypeVal,
-                                onChanged: (selectedValue) {
-                                  leadsController.employmenttypeVal = selectedValue.toString();
-                                },
-                              )),
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Loan Type',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(top: 8),
-                              child: CustomDropDown(
-                                hint: Text(
-                                  "Select loan type",
-                                  style: Theme.of(context).inputDecorationTheme.hintStyle,
-                                ),
-                                list: leadsController.loantypelist,
-                                val: leadsController.loantypelistVal,
-                                onChanged: (selectedValue) {
-                                  leadsController.loantypelistVal = selectedValue.toString();
-                                },
-                              )),
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Loan Amount',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              prefixIcon: Icon(
-                                FontAwesomeIcons.rupeeSign,
-                                size: 15,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              hintText: "Enter loan amount",
-                              textEditingController: leadsController.loanamount,
-                              focusnode: leadsController.floanamount,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.numberWithOptions(signed: true, decimal: true),
-                              onEditingComplete: () {
-                                FocusScope.of(context).requestFocus(
-                                  leadsController.faadharno,
-                                );
-                              },
-                            ),
-                          ),
+            // Next Follow-up
+            SizedBox(height: 20),
+            Text('Next Follow-up', style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 5),
+            _buildDatePicker('Next Follow-up Date', leadsController.nextFollowUpDate ),
+            SizedBox(height: 5),
+            _buildTimePicker('Next Follow-up Time', leadsController.nextFollowUpTime ),
 
-                          // Padding(
-                          //   padding: EdgeInsets.only(top: 15),
-                          //   child: Text(
-                          //     'Aadhar Card No',
-                          //     style: Theme.of(context).textTheme.bodyLarge,
-                          //   ),
-                          // ),
-                          // Padding(
-                          //   padding: EdgeInsets.only(top: 8),
-                          //   child: CustomTextFormField(
-                          //     hintText: "Enter your aadhar no",
-                          //     textEditingController: leadsController.aadharno,
-                          //     focusnode: leadsController.faadharno,
-                          //     obscureText: false,
-                          //     key: key,
-                          //     textInputType: TextInputType.numberWithOptions(signed: true, decimal: true),
-                          //     onEditingComplete: () {
-                          //       FocusScope.of(context).requestFocus(
-                          //         leadsController.fpanno,
-                          //       );
-                          //     },
-                          //   ),
-                          // ),
+            // Loan Details
+            SizedBox(height: 20),
+            Text('Loan Details', style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 5),
+            Text('Loan Type', style: commonTextStyle),
+            CustomDropDown(
+              hint: Text("Select Loan Type"),
+              list: leadsController.loanSelectionOptions ,
+              val: leadsController.selectedLoan.value, 
+              onChanged: (newValue) {
+                leadsController.selectedLoan.value = newValue; 
+              },
+            ),
+            SizedBox(height: 5),
+            Text('Bank', style: commonTextStyle),
 
-                          // Padding(
-                          //   padding: EdgeInsets.only(top: 15),
-                          //   child: Text(
-                          //     'PAN Card No',
-                          //     style: Theme.of(context).textTheme.bodyLarge,
-                          //   ),
-                          // ),
-                          // Padding(
-                          //   padding: EdgeInsets.only(top: 8),
-                          //   child: CustomTextFormField(
-                          //     hintText: "Enter your PAN No",
-                          //     textEditingController: leadsController.panno,
-                          //     focusnode: leadsController.fpanno,
-                          //     obscureText: false,
-                          //     key: key,
-                          //     textInputType: TextInputType.text,
-                          //     onEditingComplete: () {
-                          //       FocusScope.of(context).requestFocus(
-                          //         leadsController.flocation,
-                          //       );
-                          //     },
-                          //   ),
-                          // ),
+             CustomTextFormField(
+              hintText: 'Enter Bank name',
+              textEditingController: leadsController.bank ,
+            ),
 
-                          Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Text(
-                              'Address',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: CustomTextFormField(
-                              hintText: "Enter your address",
-                              textEditingController: leadsController.location,
-                              focusnode: leadsController.flocation,
-                              obscureText: false,
-                              key: key,
-                              textInputType: TextInputType.text,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )))),
+            SizedBox(height: 5),
+            Text('EMI Type', style: commonTextStyle),
+            CustomDropDown(
+              hint: Text("Select EMI Type"),
+              list: leadsController.emiTypeList,
+              val: leadsController.emiType.value, // Use .value if using Rx
+              onChanged: (newValue) {
+                leadsController.emiType.value = newValue; // Update value
+              },
+            ),
+            SizedBox(height: 5),
+            Text('Loan Amount (Rs)', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter Loan Amount',
+              textEditingController: leadsController.loanamount ,
+            ),
+            SizedBox(height: 5),
+            Text('Tenure', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter tenure',
+              textEditingController: leadsController.tenure,
+            ),
+            SizedBox(height: 5),
+            Text('Tenure Left', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter tenure left',
+              textEditingController: leadsController.tenureLeft,
+            ),
+            SizedBox(height: 5),
+            Text('Interest Rate', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter interest rate',
+              textEditingController: leadsController.interestRate,
+            ),
 
+           
+          ],
+        ),
+      ),
 
- bottomNavigationBar: CommonPadding(
-  child: PrimaryTextButton(
-    text: "Submit",
-    voidCallback: () async {
-      if (leadsController.validateForm()) {
-        // Show the confirmation dialog
-        Get.defaultDialog(
-          title: "Confirmation",
-          middleText: "Do you really want to update the data? This will override the previous data.",
-          textCancel: "Cancel",
-          textConfirm: "Confirm",
-          confirmTextColor: Colors.white,
-          buttonColor: Colors.red[400],
-          onConfirm: () async {
-            var leadDetails = leadsController.getLeadDetails();
+    bottomNavigationBar: CommonPadding(
+      child: PrimaryTextButton(
+        text: 'Submit',
+        voidCallback: (){
 
-            try {
-              await firestore.collection('leadDetails').doc(documentId).update({
-                'details': leadDetails,
-                'createdAt': FieldValue.serverTimestamp(),
-              });
+             _confirmSubmit(widget.documentId) ;
 
-              // Dismiss the dialog and show success message
-              Get.back();
-              Get.snackbar(
-                "Success",
-                "Lead updated successfully",
-                snackPosition: SnackPosition.TOP,
-                backgroundColor: Colors.green[400],
-                duration: Duration(seconds: 2),
-              );
-            } catch (e) {
-              // Dismiss the dialog and show error message
-              Get.back();
-              Get.snackbar(
-                "Error",
-                "Failed to update lead: $e",
-                snackPosition: SnackPosition.TOP,
-                backgroundColor: Colors.red[400],
-                duration: Duration(seconds: 2),
-              );
-            }
-          },
-          onCancel: () {
-            Get.back();
-          },
-        );
-      }
-    },
-  ),
-),
+             widget.onRefresh() ;
+
+        },
+
+      ),
+    ),
 
 
     );
   }
+
+  // Widget _buildAddressSection(String title , ) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(title, style: Theme.of(context).textTheme.titleLarge),
+  //       SizedBox(height: 5),
+  //       Text('State', style: commonTextStyle),
+  //       CustomTextFormField(hintText: 'Enter state', textEditingController: leadsController.state),
+  //       SizedBox(height: 5),
+  //       Text('City', style: commonTextStyle),
+  //       CustomTextFormField(hintText: 'Enter city', textEditingController: leadsController.city),
+  //       SizedBox(height: 5),
+  //       Text('Pincode', style: commonTextStyle),
+  //       CustomTextFormField(hintText: 'Enter pincode', textEditingController: leadsController.pincode),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildTimePicker(String label, Rx<TimeOfDay> time) {
+    return Obx(() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: Theme.of(context).textTheme.bodyLarge),
+            InkWell(
+              onTap: () async {
+                TimeOfDay? pickedTime = await showTimePicker(
+                  context: context,
+                  initialTime: time.value,
+                );
+                if (pickedTime != null) {
+                  time.value = pickedTime;
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Text(
+                  time.value.format(context),
+                  style: commonTextStyle,
+                ),
+              ),
+            ),
+          ],
+        ));
+  }
+
+
+  Widget _buildDatePicker(String label, Rx<DateTime> date) {
+    return Obx(() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: Theme.of(context).textTheme.bodyLarge),
+            InkWell(
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: date.value,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+              if (pickedDate != null) {
+                // Format the date into dd:mm:yyyy
+                date.value = pickedDate ;
+              }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Text(
+                    DateFormat('dd/MM/yyyy').format(date.value),
+                  style: commonTextStyle,
+                ),
+              ),
+            ),
+          ],
+        ));
+  }
+
+ 
 }
+
+
+

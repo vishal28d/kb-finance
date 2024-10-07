@@ -1,6 +1,9 @@
 // ignore_for_file: must_be_immutable
 //flutter
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_app/controllers/loan_application_controller.dart';
+import 'package:credit_app/services/CommonLoanDetailFetchData.dart';
+import 'package:credit_app/services/fetchDbData.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
 import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
@@ -13,21 +16,125 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 //packages
 import 'package:get/get.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'loan_detail_screen.dart';
 
-class LoanApplicationScreen extends BaseRoute {
-  LoanApplicationScreen({a, o}) : super(a: a, o: o, r: 'LoanApplicationScreen');
+
+class LoanApplicationScreen extends StatefulWidget {
+
+
+  @override
+  State<LoanApplicationScreen> createState() => _LoanApplicationScreenState();
+}
+
+class _LoanApplicationScreenState extends State<LoanApplicationScreen> {
   DateTime? _fromDate;
+
   DateTime? _toDate;
+
   TabController? _tabController;
 
   final LoanApplicationController loanController = Get.find<LoanApplicationController>();
+
   List<String> titleList1 = [
     'Home Loan',
     "Business Loan",
     "Personal Loan",
   ];
+
+  List<List<String>> loanDetails = [];
+
+  String? email = '' ;
+
+  void _saveEmail() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  email = prefs.getString('email')!;
+}
+
+  @override
+  void initState() {
+    fetchLoanData() ;
+    _saveEmail() ;
+    super.initState();
+
+  }
+
+  // Function to fetch loan data using CommonLoanDataFetcher
+  CommonLoanDataFetcher loanDataFetcher = CommonLoanDataFetcher();
+
+  Future<void> fetchLoanData() async {
+    loanDetails = await loanDataFetcher.fetchAllLoanDetails();
+    setState(() {}); 
+    
+  }
+
+  FirebaseFirestore _firestore = FirebaseFirestore.instance ;
+
+  Future<void> deleteLoanForm(String documentId) async {
+  try {
+    await _firestore.collection('LoanFormDetails').doc(documentId).delete();
+    Get.snackbar(
+      'Success',
+      'Loan form details deleted successfully!',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+  } catch (e) {
+    Get.snackbar(
+      'Error',
+      'Failed to delete loan form: $e',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+  }
+}
+
+
+void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Confirm Deletion',
+          style: TextStyle(color: Colors.black54), // Red color for title
+        ),
+        content: Text(
+          'Are you sure you want to delete this loan form details?',
+          style: TextStyle(color: Colors.black), // Optional: you can keep this as is or change it
+        ),
+        actions: <Widget>[
+          TextButton(
+            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)),
+            onPressed: () {
+              Get.back(); // Close the dialog
+            },
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white), // Optional: you can set this color as desired
+            ),
+          ),
+          TextButton(
+            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)),
+            onPressed: () async {
+              Get.back(); // Close the dialog
+              await deleteLoanForm(documentId); // Delete the loan form
+            },
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Colors.white), // Red color for delete button
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,6 +206,7 @@ class LoanApplicationScreen extends BaseRoute {
                   ),
                 ],
               ),
+
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
@@ -107,7 +215,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context , loanDataFetcher.pendingLoans)),
                         ],
                       ),
                     ),
@@ -115,7 +223,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context, loanDataFetcher.rmAssignedLoans)),
                         ],
                       ),
                     ),
@@ -123,7 +231,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context , loanDataFetcher.forVerificationLoans)),
                         ],
                       ),
                     ),
@@ -131,7 +239,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context, loanDataFetcher.toCreditTeamLoans)),
                         ],
                       ),
                     ),
@@ -139,7 +247,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context , loanDataFetcher.approvedLoans )),
                         ],
                       ),
                     ),
@@ -147,7 +255,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context , loanDataFetcher.declinedLoans )),
                         ],
                       ),
                     ),
@@ -155,7 +263,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context , loanDataFetcher.sanctionedLoans )),
                         ],
                       ),
                     ),
@@ -163,7 +271,7 @@ class LoanApplicationScreen extends BaseRoute {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: loanApplicationList(context)),
+                          Expanded(child: loanApplicationList(context, loanDataFetcher.disbursedLoans )),
                         ],
                       ),
                     ),
@@ -175,141 +283,270 @@ class LoanApplicationScreen extends BaseRoute {
         ));
   }
 
-  Widget loanApplicationList(context) {
-    return ListView.builder(
-        itemCount: 3,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            margin: EdgeInsets.only(top: 8, bottom: 8),
-            width: Get.width,
-            height: 75,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  children: [
-                    Container(
-                      width: Get.width / 2 - 60,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${titleList1[index]}',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2, bottom: 2),
-                            child: Text(
-                              '27-10-2020',
-                              style: Theme.of(context).primaryTextTheme.displayMedium,
-                            ),
-                          ),
-                          Text(
-                            '${global.currencySymbol}200000',
-                            style: Theme.of(context).primaryTextTheme.displayMedium,
-                          )
-                        ],
+
+ Widget loanApplicationList(BuildContext context , List<List<String>> loanDetails ) {
+
+   var filteredLoanDetails = loanDetails.where((loanDetail) {
+    return loanDetail.length > 30 && loanDetail[30] == email; // Ensure loanDetail[22] exists and matches email
+  }).toList();
+
+  // Check if the filtered list is empty and display a message
+  if (filteredLoanDetails.isEmpty) {
+    return Center(
+      child: Text(
+        'No loan applications found for this email.',
+        style: Theme.of(context).textTheme.bodyLarge,
+      ),
+    );
+  }
+  
+  return ListView.builder(
+    itemCount: loanDetails.length, // Use the length of the loanDetails list
+    itemBuilder: (BuildContext context, int index) {
+      final loanDetail = filteredLoanDetails[index]; // Get the current loan detail
+      return Container(
+        margin: EdgeInsets.only(top: 8, bottom: 8),
+        width: Get.width,
+        height: 85,
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: [
+                Container(
+                  
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loanDetail[18] ?? 'N/A', // Use the loan type from the current detail
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            PopupMenuButton(
-                                icon: Icon(Icons.more_vert, color: Colors.black),
-                                itemBuilder: (context) => [
-                                      PopupMenuItem(
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          title: Row(
-                                            children: <Widget>[
-                                              Padding(
-                                                padding: const EdgeInsets.only(right: 10),
-                                                child: Icon(
-                                                  Icons.edit,
-                                                  color: Theme.of(context).primaryColor,
-                                                ),
-                                              ),
-                                              Text(
-                                                'Edit',
-                                                style: Theme.of(context).primaryTextTheme.displayMedium,
-                                              ),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            Get.back();
-                                          },
-                                        ),
-                                      ),
-                                      PopupMenuItem(
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          title: Row(
-                                            children: <Widget>[
-                                              Padding(
-                                                padding: const EdgeInsets.only(right: 10),
-                                                child: Icon(
-                                                  Icons.delete,
-                                                  color: Theme.of(context).primaryColor,
-                                                ),
-                                              ),
-                                              Text(
-                                                'Delete',
-                                                style: Theme.of(context).primaryTextTheme.displayMedium,
-                                              ),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            Get.back();
-                                          },
-                                        ),
-                                      ),
-                                      PopupMenuItem(
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          title: Row(
-                                            children: <Widget>[
-                                              Padding(
-                                                padding: const EdgeInsets.only(right: 10),
-                                                child: Icon(
-                                                  Icons.visibility,
-                                                  color: Theme.of(context).primaryColor,
-                                                ),
-                                              ),
-                                              Text(
-                                                'View',
-                                                style: Theme.of(context).primaryTextTheme.displayMedium,
-                                              ),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            Get.back();
-                                            Get.to(() => LoanDetailScreen(
-                                                  a: a,
-                                                  o: o,
-                                                ));
-                                          },
-                                        ),
-                                      ),
-                                    ]),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2, bottom: 2),
+                        child: Text(
+                         "Name : " + loanDetail[0] ?? 'Date Not Available', // Placeholder for date
+                          style: Theme.of(context).primaryTextTheme.displayMedium,
                         ),
                       ),
-                    )
-                  ],
+                      Text(
+                        'Loan Amount : ${global.currencySymbol}${loanDetail[4]}', // Use the loan amount from the current detail
+                        style: Theme.of(context).primaryTextTheme.displayMedium,
+                      )
+                    ],
+                  ),
                 ),
-              ),
+
+                
+                Expanded(
+                  child: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        PopupMenuButton(
+                          icon: Icon(Icons.more_vert, color: Colors.black),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Edit',
+                                      style: Theme.of(context).primaryTextTheme.displayMedium,
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+
+                                  
+                                },
+                              ),
+                            ),
+
+                            PopupMenuItem(
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: Icon(
+                                        Icons.delete,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Delete',
+                                      style: Theme.of(context).primaryTextTheme.displayMedium,
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  
+                                  Navigator.pop(context) ;
+                                 _showDeleteConfirmationDialog(context, loanDetail[21]); 
+                                 print('success delete') ;
+                                 setState(() {
+                                   fetchLoanData() ;
+                                 });
+                                  
+                                },
+                              ),
+                            ),
+
+  PopupMenuItem(
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Row(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Icon(Icons.edit, color: Theme.of(context).primaryColor),
             ),
+            Text(
+              'Edit Status',
+              style: Theme.of(context).primaryTextTheme.displayMedium,
+            ),
+          ],
+        ),
+        onTap: () {
+          Navigator.pop(context); // Close popup menu
+
+          List<Map<String, String>> statuses = [
+            {"title": "Pending", "status": "Pending"},
+            {"title": "RM Assigned", "status": "RM Assigned"},
+            {"title": "For Verification", "status": "For Verification"},
+            {"title": "To Credit Team", "status": "To Credit Team"},
+            {"title": "Approved", "status": "Approved"},
+            {"title": "Decline", "status": "Decline"},
+            {"title": "Sanctioned", "status": "Sanctioned"},
+            {"title": "Disbursed", "status": "Disbursed"},
+          ];
+
+          // Show status selection dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Change Loan Status"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: statuses.map((status) {
+                    return ListTile(
+                      title: Text(status['title']!),
+                      onTap: () {
+                        Navigator.pop(context); // Close status dialog
+                        // Show confirmation dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Confirm Status Change"),
+                              content: Text(
+                                "Are you sure you want to change the loan status to ${status['title']}?",
+                              ),
+                              actions: <Widget>[
+
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black54 , 
+                                  ),
+                                  child: Text("Cancel" , style: TextStyle(color: Colors.white),),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[800] , 
+                                  ),
+                                  child: Text("Change",  style: TextStyle(color: Colors.white),),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close confirmation dialog
+                                    // Update Firestore with new status
+                                    FirebaseFirestore.instance
+                                        .collection('LoanFormDetails')
+                                        .doc(loanDetail[21]) // Replace with actual docId
+                                        .update({'loanStatus': status['status']})
+                                        .then((_) => print("Loan status updated to ${status['status']}"))
+                                        .catchError((e) => print("Error: $e"));
+
+                                  setState(() {
+                                    fetchLoanData() ;
+                                  });
+
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+              );
+            },
           );
-        });
-  }
+        },
+      ),
+    ),
+
+
+                            PopupMenuItem(
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: Icon(
+                                        Icons.visibility,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'View',
+                                      style: Theme.of(context).primaryTextTheme.displayMedium,
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  Get.back();
+                                  Get.to(() => LoanDetailScreen(
+                                    loanDetail: loanDetail,
+                                  ));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   Future loanFilter(context) {
     return Get.bottomSheet(
       SingleChildScrollView(
         child: Container(
-            height: MediaQuery.of(context).size.height / 2,
+            height: MediaQuery.of(context).size.height / 2 ,
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))),
             child: Padding(
               padding: EdgeInsets.only(left: 15, right: 15),
@@ -396,13 +633,14 @@ class LoanApplicationScreen extends BaseRoute {
                                 _selectFromDate(context);
                               },
                               obscureText: false,
-                              key: key,
+                              
                               readOnly: true,
                             ),
                           ),
                         ],
                       ),
                     ),
+
                     Padding(
                       padding: EdgeInsets.all(3),
                       child: Row(
@@ -422,13 +660,14 @@ class LoanApplicationScreen extends BaseRoute {
                                 _seletToDate(context);
                               },
                               obscureText: false,
-                              key: key,
+                             
                               readOnly: true,
                             ),
                           ),
                         ],
                       ),
                     ),
+
                     Padding(
                       padding: EdgeInsets.only(top: 15),
                       child: Container(
@@ -448,6 +687,7 @@ class LoanApplicationScreen extends BaseRoute {
     );
   }
 
+
   Future _selectFromDate(context) async {
     try {
       final DateTime? picked = await showDatePicker(
@@ -464,6 +704,7 @@ class LoanApplicationScreen extends BaseRoute {
       print('Exception - loan_list_screen - _selectFromDate(): ' + e.toString());
     }
   }
+
 
   Future _seletToDate(context) async {
     try {
@@ -483,8 +724,8 @@ class LoanApplicationScreen extends BaseRoute {
   }
 
   List<String> titleList = [];
+
   List<String> subTitle = [];
+
   List<String> loantype = [];
-
-
 }

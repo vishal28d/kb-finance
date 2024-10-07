@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:credit_app/controllers/emi_calculator_controller.dart';
 import 'package:credit_app/views/EMICalculator/RepaymentScheduleTable.dart';
 import 'package:credit_app/views/EMICalculator/LoanBreakDown.dart';
 import 'package:credit_app/widget/appBarWidget.dart';
-import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
 import 'package:credit_app/widget/custom_textformfield.dart';
 import 'package:credit_app/widget/primary_button.dart';
@@ -18,17 +18,12 @@ class EmiCalculatorScreen extends StatefulWidget {
 
 class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
   final EmiCalculatorController emiCalculatorController = Get.find<EmiCalculatorController>();
-
+ 
   double emiResult = 0.0;
-
   double loanAmount = 0.0;
-
   double annualInterestRate = 0.0;
-
   double tenureMonths = 0.0;
-
   final double maxLoanAmount = 1e9;
-
   final double maxInterestRate = 1000.0;
 
   void _extractValues() {
@@ -37,8 +32,16 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
     tenureMonths = (double.tryParse(emiCalculatorController.yearsController.text) ?? 0) * 12 +
                     (double.tryParse(emiCalculatorController.monthsController.text) ?? 0);
 
+    emiCalculatorController.initializeRepaymentSchedule(
+      loanAmount,
+    annualInterestRate,
+    tenureMonths,
+   );
+
     emiCalculatorController.update();
+
   }
+
 
   bool _validateValues() {
     if (loanAmount > maxLoanAmount || annualInterestRate > maxInterestRate) {
@@ -54,14 +57,20 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
     return true;
   }
 
+
   void _calculateAndSetEMI() {
     double monthlyInterestRate = annualInterestRate / 12 / 100;
     double emi = (loanAmount * monthlyInterestRate * pow(1 + monthlyInterestRate, tenureMonths)) /
                  (pow(1 + monthlyInterestRate, tenureMonths) - 1);
 
-    emiResult = emi;
+    setState(() {
+      emiResult = emi;
+      
+    });
+
     emiCalculatorController.update();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -111,22 +120,25 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
                   child: PrimaryTextButton(
                     text: "Calculate",
                     voidCallback: () {
+                      
                       _extractValues();
                       if (_validateValues()) {
                         _calculateAndSetEMI();
-                      
                       }
-
+                    
+              
                       
                     },
                   ),
                 ),
+
                 SizedBox(height: 5),
                 if (emiResult != 0.0)
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Text("Your EMI is: ₹ ${emiResult.toStringAsFixed(2)}", style: TextStyle(color: Colors.black, fontSize: 20)),
                   ),
+
                 Divider(),
 
                 if (emiResult != 0.0)
@@ -138,8 +150,10 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
                       tenure: tenureMonths,
                     ),
                   ),
+
                 SizedBox(height: 5),
                 Divider(),
+
                 if (emiResult != 0.0 )
                   Center(
                     child: Padding(
@@ -147,15 +161,18 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
                       child: Text("Repayment Schedule Chart", textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     ),
                   ),
+
                 if (emiResult != 0.0)
-                  Padding(
+                Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: RepaymentScheduleTable(
                       loanAmount: loanAmount,
                       annualInterestRate: annualInterestRate,
                       loanTermMonths: tenureMonths,
+                      emiResult: emiResult.toPrecision(2),
                     ),
                   ),
+              
                   
               ],
             ),
@@ -164,6 +181,7 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
       ),
     );
   }
+
 
   Widget _buildInputSection(BuildContext context, String label, String hint, TextInputType inputType, TextEditingController controller, Function(String)? onChanged) {
     return Padding(
@@ -187,6 +205,7 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
     );
   }
 
+
   Widget _buildTextFormField(String hint, TextEditingController controller, Function(String)? onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -199,4 +218,6 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
       ),
     );
   }
+
+
 }

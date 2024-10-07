@@ -91,8 +91,7 @@ class DrawerWidget extends BaseRoute {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   onTap: () {
-                    bottomNavController.setHome();
-                    Get.back();
+                    
                   },
                   trailing: Icon(Icons.arrow_forward_ios),
                 ),

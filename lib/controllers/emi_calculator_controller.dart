@@ -22,7 +22,7 @@ class EmiCalculatorController extends GetxController with WidgetsBindingObserver
   var loanAmount = 0.0.obs;
   var annualInterestRate = 0.0.obs;
   var loanTermMonths = 0.obs;
-  var repaymentSchedule = <Map<String, dynamic>>[].obs;
+  // var repaymentSchedule = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
@@ -116,4 +116,39 @@ class EmiCalculatorController extends GetxController with WidgetsBindingObserver
     // Update the repayment schedule observable
     repaymentSchedule.value = schedule;     
   }
+
+
+
+   
+  RxList<Map<String, dynamic>> repaymentSchedule = <Map<String, dynamic>>[].obs;
+
+  void initializeRepaymentSchedule(double loanAmount, double annualInterestRate, double loanTermMonths) {
+    repaymentSchedule.clear();
+
+    double monthlyInterestRate = annualInterestRate / 12 / 100;
+    double totalMonths = loanTermMonths;
+    double emi = (loanAmount * monthlyInterestRate * pow((1 + monthlyInterestRate), totalMonths)) /
+        (pow((1 + monthlyInterestRate), totalMonths) - 1);
+
+    double balance = loanAmount;
+
+    for (int i = 1; i <= totalMonths; i++) {
+      double interest = balance * monthlyInterestRate;
+      double principal = emi - interest;
+      balance -= principal;
+
+      repaymentSchedule.add({
+        'paymentNo': i,
+        'principal': principal,
+        'interest': interest,
+        'endingBalance': balance > 0 ? balance : 0,
+      });
+    }
+  }
 }
+
+ 
+
+
+
+

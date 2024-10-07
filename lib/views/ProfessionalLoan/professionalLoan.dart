@@ -1,18 +1,21 @@
-import 'package:credit_app/controllers/commonLoanController.dart';
-import 'package:credit_app/theme/nativeTheme.dart';
+
+import 'package:credit_app/controllers/professional_loan_controller.dart';
+import 'package:credit_app/views/ProfessionalLoan/professionalDocument.dart';
 import 'package:credit_app/widget/custom_dropdown.dart';
 import 'package:credit_app/widget/custom_textformfield.dart';
 import 'package:credit_app/widget/datePickerField.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CommonLoanForm extends StatefulWidget {
+class ProfessionalLoanForm extends StatefulWidget {
   @override
-  _CommonLoanFormState createState() => _CommonLoanFormState();
+  _ProfessionalLoanFormState createState() => _ProfessionalLoanFormState();
 }
 
-class _CommonLoanFormState extends State<CommonLoanForm> {
-  final CommonLoanController loanController = Get.put(CommonLoanController());
+class _ProfessionalLoanFormState extends State<ProfessionalLoanForm> {
+
+  final ProfessionalLoanController loanController = Get.put(ProfessionalLoanController());
+
   final PageController _pageController = PageController();
   int _currentPage = 0; // Track the current page
 
@@ -39,7 +42,7 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Loan Application Form'),
+        title: Text('Professional Loan Form'),
         centerTitle: true,
       ),
       body: PageView(
@@ -50,6 +53,11 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
           _buildLoanAndPersonalDetailsStep(context),
           // Step 2: Address Details
           _buildAddressDetailsStep(context),
+          // step 3 : work details
+          _buildWorkDetailsStep(context) ,
+          // documents
+          _buildUploadDocuments(context) ,
+          
         ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
@@ -173,21 +181,21 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
                   Text('Spouse\'s Name', style: Theme.of(context).textTheme.bodyLarge),
                   CustomTextFormField(
                     hintText: "Enter Spouse's name",
-                    textEditingController: loanController.SpouseNameController,
+                    textEditingController: loanController.spouseNameController,
                   ),
                   SizedBox(height: 10),
                   Text('Spouse\'s Mobile Number', style: Theme.of(context).textTheme.bodyLarge),
                   CustomTextFormField(
                     hintText: "Enter Spouse's mobile number",
-                    textEditingController: loanController.SpouseMobileController,
+                    textEditingController: loanController.spouseMobileController,
                     textInputType: TextInputType.phone,
                   ),
                   SizedBox(height: 10),
 
                   DatePickerField(
-                        date: loanController.SpouseDob.value,
+                        date: loanController.spouseDob.value,
                         labelText: "Spouse's Date of Birth",
-                        onChanged: (date) => loanController.SpouseDob.value = date,
+                        onChanged: (date) => loanController.spouseDob.value = date!,
                    ),
                   
                   SizedBox(height: 10,) ,
@@ -207,7 +215,7 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
                   Obx(() => DatePickerField(
                         date: loanController.nomineeDob.value,
                         labelText: "Nominee Date of Birth",
-                        onChanged: (date) => loanController.nomineeDob.value = date,
+                        onChanged: (date) => loanController.nomineeDob.value = date!,
                       )),
                   SizedBox(height: 10),
                   Text('Nominee\'s Relation', style: Theme.of(context).textTheme.bodyLarge),
@@ -329,6 +337,272 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
   }
 
 
+
+Widget _buildWorkDetailsStep(BuildContext context) {
+  return SingleChildScrollView(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Work Details', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        
+        // Professional or Business Selection
+        Text('Job', style: Theme.of(context).textTheme.bodyLarge),
+        CustomDropDown(
+          hint: Text("Select"),
+          list: ["Professional", "Business"],
+          val: loanController.selectedJobType.value.isNotEmpty
+              ? loanController.selectedJobType.value
+              : null,
+          onChanged: (value) => loanController.selectedJobType.value = value.toString(),
+        ),
+        SizedBox(height: 10),
+
+        // Conditional Fields: Professional or Business
+        Obx(() {
+          if (loanController.selectedJobType.value == 'Professional') {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Clinic or Hospital Address', style: Theme.of(context).textTheme.bodyLarge),
+                CustomTextFormField(
+                  hintText: "Enter clinic or hospital address",
+                  textEditingController: loanController.clinicAddressController,
+                ),
+                SizedBox(height: 10),
+                Text('Graduation Year', style: Theme.of(context).textTheme.bodyLarge),
+                CustomTextFormField(
+                  hintText: "Enter graduation year",
+                  textEditingController: loanController.graduationYearController,
+                  textInputType: TextInputType.number,
+                ),
+                SizedBox(height: 10),
+                Text('Experience (in years)', style: Theme.of(context).textTheme.bodyLarge),
+                CustomTextFormField(
+                  hintText: "Enter experience",
+                  textEditingController: loanController.experienceController,
+                  textInputType: TextInputType.number,
+                ),
+                SizedBox(height: 10),
+                Text('Professional Degree', style: Theme.of(context).textTheme.bodyLarge),
+                CustomTextFormField(
+                  hintText: "Enter degree",
+                  textEditingController: loanController.professionalDegreeController,
+                ),
+              ],
+            );
+          } else if (loanController.selectedJobType.value == 'Business') {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Business Type', style: Theme.of(context).textTheme.bodyLarge),
+                CustomDropDown(
+                  hint: Text("Select Business Type"),
+                  list: ["Proprietor", "Partnership", "Private Limited", "LLP"],
+                  val: loanController.businessType.value.isNotEmpty
+                      ? loanController.businessType.value
+                      : null,
+                  onChanged: (value) => loanController.businessType.value = value.toString(),
+                ),
+                SizedBox(height: 10),
+                Text('Do You Have Business Proof?', style: Theme.of(context).textTheme.bodyLarge),
+                CustomDropDown(
+                  hint: Text("Select Proof"),
+                  list: ["GST", "Gumasta", "Drug License", "FSSAI", "Udyam Aadhar", "Other", "None"],
+                  val: loanController.businessProofType.value.isNotEmpty
+                      ? loanController.businessProofType.value
+                      : null,
+                  onChanged: (value) => loanController.businessProofType.value = value.toString(),
+                ),
+                SizedBox(height: 10),
+                Text('Annual Turnover (in ₹)', style: Theme.of(context).textTheme.bodyLarge),
+                CustomTextFormField(
+                  hintText: "Enter turnover",
+                  textEditingController: loanController.turnoverController,
+                  textInputType: TextInputType.number,
+                ),
+                SizedBox(height: 10),
+                Text('Years in Business', style: Theme.of(context).textTheme.bodyLarge),
+                CustomTextFormField(
+                  hintText: "Enter years in business",
+                  textEditingController: loanController.yearsInBusinessController,
+                  textInputType: TextInputType.number,
+                ),
+              ],
+            );
+          } else {
+            return Container();
+          }
+        }),
+
+        SizedBox(height: 20),
+        // Reference Details
+        Text('Reference Details', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        Text('1) Relative/Friend Name', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter name",
+          textEditingController: loanController.reference1NameController,
+        ),
+        SizedBox(height: 10),
+        Text('Mobile Number', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter mobile number",
+          textEditingController: loanController.reference1MobileController,
+          textInputType: TextInputType.phone,
+        ),
+        SizedBox(height: 10),
+        Text('Address', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter Address details",
+          textEditingController: loanController.reference1AddressController,
+          textInputType: TextInputType.text,
+        ),
+        SizedBox(height: 10),
+        Text('2) Relative/Friend Name', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter name",
+          textEditingController: loanController.reference2NameController,
+        ),
+        SizedBox(height: 10),
+        Text('Mobile Number', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter mobile number",
+          textEditingController: loanController.reference2MobileController,
+          textInputType: TextInputType.phone,
+        ),
+        SizedBox(height: 10),
+
+        Text('Address', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter Address details",
+          textEditingController: loanController.reference2AddressController,
+          textInputType: TextInputType.text,
+        ),
+
+        Text('Current Loan Details', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        Text('Enter Current Bank', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter Current Bank",
+          textEditingController: loanController.currentLoanBank,
+          textInputType: TextInputType.text,
+        ),
+
+        SizedBox(height: 10),
+        Text('Enter EMI Amount', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter EMI Amount",
+          textEditingController: loanController.emiAmount,
+          textInputType: TextInputType.text,
+        ),
+
+        SizedBox(height: 10),
+        Text('Select Loan Type', style: Theme.of(context).textTheme.bodyLarge),
+        CustomDropDown(
+                  hint: Text("Select Loan Type"),
+                  list:  [
+              "Loan Takeover / BT",
+                "Personal Loan",
+                "Business Loan",
+                "Professional Loan",
+                "Home Loan",
+                "Mortgage Loan",
+                "New Car Loan",
+                "Used Car Loan",
+                "Used Tractor Loan",
+                "New Tractor Loan",
+                "Used Commercial Vehicles",
+                "New Commercial Vehicles",
+                "Two Wheeler Loan",
+                "Used Two Wheeler Loan",
+                "New Three Vehicles Loan",
+                "Credit Card",
+                "KCC Loan",
+                "Working Capital / CC / OD",
+                "Account Opening",
+                "Insurance",
+                "Investment"
+            ],
+                  val: loanController.loanType.value.isNotEmpty
+                      ? loanController.loanType.value
+                      : null,
+                  onChanged: (value) => loanController.loanType.value = value.toString(),
+        ),
+
+        SizedBox(height: 10),
+        Text('Select Disbursed Date', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Select Disbursed Date",
+          textEditingController: loanController.disbursedDate ,
+          textInputType: TextInputType.datetime,
+        ),
+
+        SizedBox(height: 10),
+        Text('Enter Loan Amount', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter Loan Amount",
+          textEditingController: loanController.loanAmount ,
+          textInputType: TextInputType.number,
+        ),
+        SizedBox(height: 10,) ,
+
+      // vehicle details car
+        Text('Additional Details', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        Text('Do You Have Car Or Commercial Vehicle ? If You Have', style: Theme.of(context).textTheme.bodyLarge),
+        Text('Enter Car Name With Company Name', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter details",
+          textEditingController: loanController.carDetails ,
+          textInputType: TextInputType.text,
+        ),
+        SizedBox(height: 10,) ,
+        Text('Registration Details', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter Registration Date",
+          textEditingController: loanController.carRegistrationDate ,
+          textInputType: TextInputType.datetime,
+        ),
+
+        SizedBox(height: 10,) ,
+        Text('Are you using Credit Card (if yes)', style: Theme.of(context).textTheme.bodyLarge),
+        CustomTextFormField(
+          hintText: "Enter Bank Name",
+          textEditingController: loanController.creditBankName ,
+          textInputType: TextInputType.datetime,
+        ),
+
+        SizedBox(height: 10,) ,
+
+        Text('Your Firm is Audited?', style: Theme.of(context).textTheme.bodyLarge),
+        CustomDropDown(
+                  hint: Text("Your Firm is Audited?"),
+                  list: ["Yes", "No"],
+                  val: loanController.isAudited.value.isNotEmpty
+                      ? loanController.isAudited.value
+                      : null,
+                  onChanged: (value) => loanController.isAudited.value = value.toString(),
+            ),
+
+        SizedBox(height: 10,) , 
+
+      
+
+      ],
+    ),
+  );
+}
+
+
+  Widget _buildUploadDocuments(BuildContext context) {
+    return 
+        UploadDocumentsScreen() ;
+  }
+
+
+
   Widget _buildBottomNavigationBar() {
     return BottomAppBar(
       child: Row(
@@ -348,14 +622,16 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
           ElevatedButton(
             style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 167, 12, 12))) ,
             onPressed: () {
-      if (_currentPage == 1) {
+      if (_currentPage == 3) {
         // Show confirmation dialog
         showConfirmationDialog(context, () {
           // Handle form submission
 
           loanController.getEmail() ;
 
-          loanController.submitForm();
+          loanController.compileData(); 
+          Navigator.pop(context) ;
+          
           print("Form Submitted");
         });
       } else {
@@ -363,7 +639,7 @@ class _CommonLoanFormState extends State<CommonLoanForm> {
         _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.ease);
       }
     },
-            child: Text(_currentPage == 1 ? 'Submit' : 'Next'),
+            child: Text(_currentPage == 3 ? 'Submit' : 'Next'),
           ),
         ],
       ),
@@ -379,7 +655,7 @@ void showConfirmationDialog(BuildContext context, Function onConfirm) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Confirm Submission'),
-        content: Text('Are you sure you want to submit the form?'),
+        content: Text('Are you sure you want to submit the form and go back?'),
         actions: <Widget>[
           ElevatedButton(
             style: ElevatedButton.styleFrom(

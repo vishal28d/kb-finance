@@ -6,9 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BankerFormScreen extends GetView<BankerFormController> {
-
-  final BankerFormController bankerFormController = Get.put(BankerFormController());
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,24 +19,81 @@ class BankerFormScreen extends GetView<BankerFormController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Select Bank Dropdown
-              Obx(() => DropdownButtonFormField<String>(
-                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
-                    value: controller.selectedBank.value.isEmpty ? null : controller.selectedBank.value,
-                    hint: Text("Select Bank or NBFC"),
-                    onChanged: (newValue) {
-                      controller.selectedBank.value = newValue!;
-                    },
-                    items: controller.banks.map((bank) {
-                      return DropdownMenuItem(
-                        value: bank,
-                        child: Text(bank),
-                      );
-                    }).toList(),
-                  )),
-              SizedBox(height: 16),
+              // Select Bank TextFieldSearch
+            SizedBox(height: 5,),
+
+             TextField(
+              controller: controller.bankTextController,
+              onChanged: (query) {
+              // Call the function to filter the banks when text changes
+              controller.filterBanks(query);
+
+              // Clear the selected bank if the user is typing something else
+              if (query.isEmpty) {
+                controller.selectedBank.value = '';
+              }
+            },
+          decoration: InputDecoration(
+            labelText: "Search Bank or NBFC",
+            border: OutlineInputBorder(),
+          ),
+        ),
+        SizedBox(height: 4),
+
+// Display the filtered results
+Obx(() {
+  // Show the SizedBox only if there are filtered results or the user is typing
+  if (controller.filteredBanks.isEmpty &&
+      controller.bankTextController.text.isNotEmpty) {
+    return const SizedBox(height: 4); 
+  }
+
+  // If no filtered banks and no text, don't display anything
+  if (controller.filteredBanks.isEmpty && controller.bankTextController.text.isEmpty) {
+    return SizedBox(); // Nothing to display
+  }
+
+  return SizedBox(
+    height: 200,
+    child: Obx(() {
+      // Show the ListView only if no bank is selected
+      if (controller.selectedBank.value.isEmpty) {
+        return ListView.builder(
+          itemCount: controller.filteredBanks.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(controller.filteredBanks[index]),
+              onTap: () {
+                // Update the selected bank and set the text field's value
+                controller.selectedBank.value = controller.filteredBanks[index];
+                controller.bankTextController.text = controller.filteredBanks[index];
+
+                // Clear the filter once the bank is selected
+                controller.filteredBanks.clear();
+              },
+            );
+          },
+        );
+      } else {
+        // If a bank is selected, hide the list
+        return SizedBox(); // Hide ListView
+      }
+    }),
+  );
+}),
+
+
+          SizedBox(height: 10),
+
+          // Display the selected bank
+          Obx(() => Text(
+            "Selected Bank: ${controller.selectedBank.value}",
+            style: TextStyle(fontSize: 16, color:  Colors.black45),
+          )),
+          SizedBox(height: 10),
 
               // Designation Input
+
               TextField(
                 controller: controller.designationController,
                 decoration: InputDecoration(
@@ -48,7 +102,6 @@ class BankerFormScreen extends GetView<BankerFormController> {
                 ),
               ),
               SizedBox(height: 16),
-
               // Full Name Input
               TextField(
                 controller: controller.fullNameController,
@@ -58,7 +111,6 @@ class BankerFormScreen extends GetView<BankerFormController> {
                 ),
               ),
               SizedBox(height: 16),
-
               // Email ID Input
               TextField(
                 controller: controller.emailController,
@@ -69,36 +121,45 @@ class BankerFormScreen extends GetView<BankerFormController> {
                 keyboardType: TextInputType.emailAddress,
               ),
               SizedBox(height: 16),
-
               // Select State Dropdown
-              Obx(() => DropdownButtonFormField<String>(
-                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
-                    value: controller.selectedState.value.isEmpty ? null : controller.selectedState.value,
-                    hint: Text("Select State"),
-                    onChanged: (newValue) {
-                      controller.selectedState.value = newValue!;
-                      controller.selectedDistrict.value = ''; // Reset district when state changes
-                    },
-                    items: controller.states.map((state) {
-                      return DropdownMenuItem(
-                        value: state,
-                        child: Text(state),
-                      );
-                    }).toList(),
-                  )),
+              Obx(
+                () => DropdownButtonFormField<String>(
+                  style: TextStyle(
+                      color: Colors.black54, fontWeight: FontWeight.bold),
+                  value: controller.selectedState.value.isEmpty
+                      ? null
+                      : controller.selectedState.value,
+                  hint: Text("Select State"),
+                  onChanged: (newValue) {
+                    controller.selectedState.value = newValue!;
+                    controller.selectedDistrict.value =
+                        ''; // Reset district when state changes
+                  },
+                  items: controller.states.map((state) {
+                    return DropdownMenuItem(
+                      value: state,
+                      child: Text(state),
+                    );
+                  }).toList(),
+                ),
+              ),
               SizedBox(height: 16),
-
               // Select District Dropdown (based on selected state)
               Obx(() {
+                // Only show this dropdown if a state is selected
                 if (controller.selectedState.value.isNotEmpty) {
                   return DropdownButtonFormField<String>(
-                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
-                    value: controller.selectedDistrict.value.isEmpty ? null : controller.selectedDistrict.value,
+                    style: TextStyle(
+                        color: Colors.black54, fontWeight: FontWeight.bold),
+                    value: controller.selectedDistrict.value.isEmpty
+                        ? null
+                        : controller.selectedDistrict.value,
                     hint: Text("Select District"),
                     onChanged: (newValue) {
                       controller.selectedDistrict.value = newValue!;
                     },
-                    items: controller.districts[controller.selectedState.value]!
+                    items: controller
+                        .districts[controller.selectedState.value]!
                         .map((district) {
                       return DropdownMenuItem(
                         value: district,
@@ -107,10 +168,9 @@ class BankerFormScreen extends GetView<BankerFormController> {
                     }).toList(),
                   );
                 }
-                return SizedBox.shrink();
+                return SizedBox.shrink(); // Don't show anything if no state is selected
               }),
               SizedBox(height: 16),
-
               // Pincode Input
               TextField(
                 controller: controller.pincodeController,
@@ -121,22 +181,20 @@ class BankerFormScreen extends GetView<BankerFormController> {
                 keyboardType: TextInputType.number,
               ),
               SizedBox(height: 16),
-
               // Submit Button
               Center(
                 child: PrimaryTextButton(
                   voidCallback: () {
                     if (controller.isFormValid()) {
-                      // Handle form submission
+                      
+                    controller.insertBankersDetail() ;
                   
-                      Get.snackbar("Success", "Form Submitted", backgroundColor: Colors.green[400]);
-
-                      // Navigate to RegistrationScreen and remove all previous screens
                       Get.to(() => RegistrationScreen());
 
                       controller.clearForm();
                     } else {
-                      Get.snackbar("Error", "Please fill all fields", backgroundColor: Colors.red[400]);
+                      Get.snackbar("Error", "Please fill all fields",
+                          backgroundColor: Colors.red[400]);
                     }
                   },
                   text: "Submit",

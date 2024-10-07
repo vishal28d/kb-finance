@@ -37,11 +37,12 @@ class CalculatorController extends GetxController {
     } else if (buttonText == "DEL") {
       delete();
     } else if (buttonText == "=") {
-      calculateResult();
+      calculateResult(); // Calculate when "=" is pressed
     } else if (buttonText == "+/-") {
       toggleSign();
     } else {
       input.value += buttonText;
+      autoCalculate(); // Automatically calculate after any input
     }
   }
 
@@ -56,6 +57,7 @@ class CalculatorController extends GetxController {
     if (input.isNotEmpty) {
       input.value = input.value.substring(0, input.value.length - 1);
     }
+    autoCalculate(); // Recalculate after deletion
   }
 
   // Toggle between positive and negative values
@@ -67,18 +69,51 @@ class CalculatorController extends GetxController {
         input.value = '-' + input.value;
       }
     }
+    autoCalculate(); // Recalculate after toggling sign
   }
 
   // Calculate the result of the expression
-  void calculateResult() {
-    try {
-      Parser parser = Parser();
-      Expression expression = parser.parse(input.value.replaceAll('x', '*'));
-      ContextModel cm = ContextModel();
-      double eval = expression.evaluate(EvaluationType.REAL, cm);
-      output.value = eval.toString();
-    } catch (e) {
-      output.value = "Error";
+ void calculateResult() {
+  try {
+    // Replace 'x' with '*', but retain '%' in the input and handle it during calculation
+    String userInput = input.value.replaceAll('x', '*');
+
+    // Handle percentages in the form of `x%y` as `(x/100)*y` and `x%` as `(x/100)`
+    userInput = userInput.replaceAllMapped(
+      RegExp(r'(\d+(\.\d+)?)%(\d+(\.\d+)?)?'),
+      (match) {
+        String num1 = match.group(1)!;  // first number before %
+        String? num2 = match.group(3);  // optional second number after %
+
+        if (num2 != null) {
+          // If the percentage is followed by another number (e.g., 4%2), convert it to (4/100) * 2
+          return '($num1/100)*$num2';
+        } else {
+          // If it's just a percentage (e.g., 4%), convert it to (4/100)
+          return '($num1/100)';
+        }
+      },
+    );
+
+    // Parse and evaluate the final expression
+    Parser parser = Parser();
+    Expression expression = parser.parse(userInput);
+    ContextModel cm = ContextModel();
+    double eval = expression.evaluate(EvaluationType.REAL, cm);
+
+    // Set the output value with the result rounded to 2 decimal places
+    output.value = eval.toStringAsFixed(2);
+  } catch (e) {
+    // Handle any error during the evaluation process
+    output.value = "Error";
+  }
+}
+
+
+  // Automatically calculate result after any input change
+  void autoCalculate() {
+    if (input.isNotEmpty && !isOperator(input.value[input.value.length - 1])) {
+      calculateResult();
     }
   }
 
@@ -147,8 +182,7 @@ class ReadyMadeCalculator extends StatelessWidget {
 
                   // Grid for calculator buttons
                   Padding(
-                    
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 30),
                     child: GridView.builder(
                         shrinkWrap: true, // Adjust the size based on children
                         physics: const NeverScrollableScrollPhysics(),
@@ -204,11 +238,10 @@ class CalButton extends StatelessWidget {
     return InkWell(
       onTap: onTapped!,
       child: Padding(
-        
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         child: Container(
-          height: 45 ,
-          width: 45 ,
+          height: 45,
+          width: 45,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(60)),
             color: color,

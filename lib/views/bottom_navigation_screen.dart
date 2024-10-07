@@ -25,8 +25,7 @@ class BottomNavigationScreen extends BaseRoute {
                
               ),
         LoanApplicationScreen(
-          a: a,
-          o: o,
+
         ),
         ProfileScreen(
           // a: a,
