@@ -1,84 +1,31 @@
+
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart'; // Import InAppWebView
+import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';  // Ensure this import for SVGs
 
-class WebViewScreen extends StatefulWidget {
-  final String url;
-  final String title;
-
-  WebViewScreen({required this.url, required this.title});
-
-  @override
-  _WebViewScreenState createState() => _WebViewScreenState();
-}
-
-class _WebViewScreenState extends State<WebViewScreen> {
-  InAppWebViewController? webViewController;
-  bool isLoading = true; // To show a loading spinner
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Stack(
-        children: [
-          InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.url))),
-            onWebViewCreated: (controller) {
-              webViewController = controller;
-            },
-            onLoadStop: (controller, url) async {
-              setState(() {
-                isLoading = false; // Stop showing the loading indicator once the page is loaded
-              });
-            },
-            onLoadStart: (controller, url) {
-              setState(() {
-                isLoading = true; // Show loading when a page starts loading
-              });
-            },
-          ),
-          if (isLoading)
-            Center(child: CircularProgressIndicator()), // Loading spinner
-        ],
-      ),
-    );
-  }
-}
-
-
-
-class LearnWithKb extends StatelessWidget {
+class JobAndCibil extends StatelessWidget {
   final List<String> loanNames = [
-    'Loan Documents',
-    'How to Sell Loans',
-    'How to DL Loan',
-    'How to Read Docs'
+    'Give Job',
+    'Take Job',
+    'Blog',
+    'FAQ'
   ];
-
+                      
+                     
   final List<String> iconList = [
-    'assets/loan_icons/loan_document.png',
-    'assets/loan_icons/sell_loan.png',
-    'assets/loan_icons/demand_loan.png',
-    'assets/loan_icons/read_docs.png',
-    
-  ];
-
-  final List<String> urlList = [
-    'https://kbfinance.in/blog/',                 // Blogs
-    'https://kbfinance.in/educational-videos/',   // Educational Videos
-    'https://kbfinance.in/faqs/',                 // FAQs
-    'https://kbfinance.in/job-openings/'          // Career
+    'assets/loan_icons/give_job.svg',
+    'assets/loan_icons/take_job.svg',
+    'assets/loan_icons/blog.svg',
+    'assets/loan_icons/faq.svg',
+  
   ];
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Card(
-        color: Color(0xFFC63437),
+        color: Color(0xFFC63437),  // Applying custom color
         margin: EdgeInsets.only(top: 0, bottom: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,10 +33,10 @@ class LearnWithKb extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: 15, right: 15, bottom: 5, top: 5),
               child: Text(
-                'Learn With KB',
+                'Job & CIBIL',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white,
+                  color: Colors.white, // Changing text color to white
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -103,16 +50,11 @@ class LearnWithKb extends StatelessWidget {
                 mainAxisSpacing: 20,
                 crossAxisCount: 4,
                 children: List.generate(
-                  loanNames.length,
+                  4,
                   (index) => GestureDetector(
                     onTap: () {
-                      // Navigate to WebViewScreen on tap
-                      Get.to(
-                        () => WebViewScreen(
-                          url: urlList[index],
-                          title: loanNames[index],
-                        ),
-                      );
+                      // Handle navigation on tap based on index
+                      Get.to(() => NotAvailablePage());
                     },
                     child: Column(
                       children: [
@@ -133,11 +75,12 @@ class LearnWithKb extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                  padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                                   width: 32,
-                                  child: Image.asset(
-                                    iconList[index % iconList.length], // Reusing icons cyclically
+                                  child: SvgPicture.asset(
+                                    iconList[index],
                                     height: 45,
+                                    // ignore: deprecated_member_use
                                     color: Color(0xFFC63437), // Applying color to SVG icons
                                   ),
                                 ),
@@ -153,7 +96,7 @@ class LearnWithKb extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.white,
+                                color: Colors.white, 
                                 fontWeight: FontWeight.w600,
                               ),
                               maxLines: 2,

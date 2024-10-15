@@ -1,25 +1,24 @@
+import 'package:credit_app/views/Commercial%20Vehicle%20Loan/com_vehicle_loan_screen.dart';
 import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_svg/flutter_svg.dart';  // Ensure this import for SVGs
+import 'package:flutter_svg/flutter_svg.dart';  
+
 
 class CommercialVehicleLoan extends StatelessWidget {
   final List<String> loanNames = [
+    'Tractor Purchase',
     'Tractor Refinance',
-    'Harvester Refinance',
-    'Truck Refinance',
+    'Commercial Purchase',
     'Commercial Refinance'
   ];
 
   final List<String> iconList = [
-    'assets/bank.svg',
-    'assets/businessman-and-dollar-coin-svgrepo-com.svg',
-    'assets/business-svgrepo-com.svg',
-    'assets/card.svg',
-    'assets/bank.svg',
-    'assets/Group 650.svg',
-    'assets/otherloan.svg',
-    'assets/otherloanservice.svg'
+    'assets/loan_icons/tractor_purchase.png',
+    'assets/loan_icons/tractor-refinance.png',
+    'assets/loan_icons/commercial_purchase.png',
+    'assets/loan_icons/commercial_refinance.png',
+    
   ];
 
   @override
@@ -55,7 +54,7 @@ class CommercialVehicleLoan extends StatelessWidget {
                   (index) => GestureDetector(
                     onTap: () {
                       // Handle navigation on tap based on index
-                      Get.to(() => CommonLoanForm());
+                      Get.to(() => ComVehicleLoanScreen());
                     },
                     child: Column(
                       children: [
@@ -76,9 +75,9 @@ class CommercialVehicleLoan extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                                  padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                                   width: 32,
-                                  child: SvgPicture.asset(
+                                  child: Image.asset(
                                     iconList[index],
                                     height: 45,
                                     color: Color(0xFFC63437), // Applying color to SVG icons

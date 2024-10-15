@@ -6,27 +6,32 @@ import 'package:credit_app/controllers/home_controller.dart';
 import 'package:credit_app/controllers/home_loan_controller.dart';
 import 'package:credit_app/controllers/loan_against_property_controller.dart';
 import 'package:credit_app/views/AffordableEMiCalculator/AffordableEmiCalculator.dart';
-import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
+import 'package:credit_app/views/CarLoan/car_loan_screen.dart';
+
 import 'package:credit_app/views/EMICalculator/emi_calculator_screen.dart';
 import 'package:credit_app/views/FdCalculator/fd_calculator.dart';
 import 'package:credit_app/views/Home/commercialVehicleLoan.dart';
 import 'package:credit_app/views/Home/industrialLoan.dart';
+import 'package:credit_app/views/Home/job_cibil.dart';
 import 'package:credit_app/views/Home/learnWithKB.dart';
 import 'package:credit_app/views/Home/otherLoans.dart';
 import 'package:credit_app/views/Leads/add_lead_screen.dart';
-import 'package:credit_app/views/LoanApplications/loan_application_screen.dart';
-import 'package:credit_app/views/ProfessionalLoan/professionalLoan.dart';
+
+import 'package:credit_app/views/Property%20Loans/property_loan_screen.dart';
+// 
 import 'package:credit_app/views/SimpleCalculator.dart/readymade_calculator.dart';
 import 'package:credit_app/views/Leads/lead_screen.dart';
-import 'package:credit_app/views/Notifications/notification_screen.dart';
+
+import 'package:credit_app/views/UnsecuredLoans/professionalLoan.dart';
 import 'package:credit_app/widget/elevated_button_widget.dart';
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 
 
 //controllers
 import 'package:credit_app/utils/global.dart' as global;
 import 'package:credit_app/views/BusinessLoan/choose_screen_blscreen.dart';
-import 'package:credit_app/views/HomeLoan/choose_screen_hlscreen.dart';
+// import 'package:credit_app/views/HomeLoan/choose_screen_hlscreen.dart';
 import 'package:credit_app/views/LoanAgainstProperty/choose_screen_lapscreen.dart';
 import 'package:credit_app/views/OtherLoan/other_loan_screen.dart';
 import 'package:credit_app/views/OtherServices/other_service.dart';
@@ -70,7 +75,6 @@ class _HomeScreen2State extends State<HomeScreen2> {
   void initState() {
     super.initState();
     setUserRole() ;
-
   }
 
 
@@ -87,7 +91,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
     Color(0xFF2DD0C3),
   ];
 
-  List<String> loanNames = [
+  List<String> UnsecuredLoanName = [
     'Personal Loan',
     'Business Loan',
     'Balance Transfer',
@@ -96,9 +100,9 @@ class _HomeScreen2State extends State<HomeScreen2> {
 
   List<String> propertyLoanNames= [
     'Home Loan',
-    'Mortage Loan',
+    'Mortgage Loan',
     'Commercial Purchase',
-    'Commercial Mortage' ,
+    'Commercial Mortgage' ,
   ];
 
   List<String> CarLoanNames= [
@@ -175,6 +179,15 @@ class _HomeScreen2State extends State<HomeScreen2> {
 
   ];
 
+  List<String> UnsecuredLoansIcons = [
+    'assets/loan_icons/personal_loan.png' ,
+    'assets/loan_icons/business_loan.png' ,
+    'assets/loan_icons/balance_transfer.png' ,
+    'assets/loan_icons/professional_loan.png' ,
+   
+
+  ] ;
+
 
   List<Widget> banners(context) {
     List<Widget> list = [];
@@ -237,7 +250,12 @@ class _HomeScreen2State extends State<HomeScreen2> {
               )),
               Padding(
                 padding: EdgeInsets.only(left: 10.0),
-                child: Text('Hi $displayName'),
+                child: Text(
+                    'Hi $displayName',
+                    style: TextStyle(
+                      fontSize: displayName.length > 20 ? 20/1.15 : 20,  // Adjust font size based on string length
+                    ),
+                  ),
               ),
             ],
           ),
@@ -247,9 +265,12 @@ class _HomeScreen2State extends State<HomeScreen2> {
                 IconButton(
                     icon: FaIcon(FontAwesomeIcons.bell),
                     onPressed: () {
-                      Get.to(() => NotificationScreen(
+                      //  Get.to(() => NotificationScreen(
                           
-                          ));
+                      //     ));
+                      Get.to(()=> NotAvailablePage()) ;
+
+
                     }),
                 Positioned(
                   right: 11,
@@ -628,6 +649,12 @@ class _HomeScreen2State extends State<HomeScreen2> {
                 ),
 
 
+        //  Learn With KB Finance
+          LearnWithKb() ,
+
+         // Job & CIBIL 
+         JobAndCibil() , 
+
         // unsecured loans
 
 SingleChildScrollView(
@@ -662,13 +689,13 @@ SingleChildScrollView(
                 onTap: () {
                   // Handle onTap
                   if (index == 0) {
-                    Get.to(()=> CommonLoanForm()) ;
+                    Get.to(()=> ProfessionalLoanForm()) ;
 
                   } else if (index == 1) {
-                        Get.to(()=> CommonLoanForm()) ;
+                        Get.to(()=> ProfessionalLoanForm()) ;
 
                   } else if (index == 2) {
-                      Get.to(()=> CommonLoanForm()) ;
+                      Get.to(()=> ProfessionalLoanForm()) ;
 
                   } else if (index == 3) {
                         Get.to(()=> ProfessionalLoanForm()) ;
@@ -694,10 +721,10 @@ SingleChildScrollView(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                              padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                               width: 32,
-                              child: SvgPicture.asset(
-                                iconList[index],
+                              child: Image.asset(
+                                UnsecuredLoansIcons[index],
                                 height: 45,
                                 // ignore: deprecated_member_use
                                 color: Color(0xFFC63437),
@@ -711,7 +738,7 @@ SingleChildScrollView(
                     Expanded(
                       child: Container(
                         child: Text(
-                          '${loanNames[index]}',
+                          '${UnsecuredLoanName[index]}',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 12,
@@ -771,30 +798,23 @@ SingleChildScrollView(
                                 (index) => GestureDetector(
                                       onTap: () {
                                         if (index == 0) {
-                                           Get.to(()=> CommonLoanForm()) ;
+                                           Get.to(()=> CarLoanForm()) ;
 
                                         } 
                                         
                                         else if (index == 1) {
-                                            Get.to(()=> CommonLoanForm()) ;
+                                            Get.to(()=> CarLoanForm()) ;
 
                                         }                
                                         
                                         else if (index == 2) {
-                                            Get.to(()=> CommonLoanForm()) ;
-
+                                            Get.to(()=> CarLoanForm()) ;
 
                                         } 
                                         else if (index == 3) {
-                                              Get.to(()=> CommonLoanForm()) ;
-
+                                              Get.to(()=> CarLoanForm()) ;
                                         } 
-                                        
-                                        else if (index == 4) {
-                                            Get.to(()=> CommonLoanForm()) ;
-
-                                        } 
-               
+                                              
                                       },
                   
                                       child: Column(
@@ -906,17 +926,17 @@ SingleChildScrollView(
                   // Handle onTap
                   if (index == 0) {
                     // Action for first item
-                      Get.to(()=> CommonLoanForm()) ;
+                      Get.to(()=> PropertyLoanForm()) ;
 
                   } else if (index == 1) {
-                        Get.to(()=> CommonLoanForm()) ;
+                        Get.to(()=> PropertyLoanForm()) ;
 
                   
                   } else if (index == 2) {
-                      Get.to(()=> CommonLoanForm()) ;
+                      Get.to(()=> PropertyLoanForm()) ;
 
                   } else if (index == 3) {
-                      Get.to(()=> CommonLoanForm()) ;
+                      Get.to(()=> PropertyLoanForm()) ;
 
                   }
                 },
@@ -980,12 +1000,10 @@ SingleChildScrollView(
   ),
 ),
       
-       
-
+        
         CommercialVehicleLoan() ,
         IndustrialLoan(),
         OtherLoansAndCreditCard() ,
-        LearnWithKb() ,
 
 
               ],
@@ -993,6 +1011,8 @@ SingleChildScrollView(
           ),
         ));
   }
+
+
 
   Widget loanCardlist(context) {
     return ListView.builder(
@@ -1050,7 +1070,7 @@ SingleChildScrollView(
                                     ));
                               } else if (index == 2) {
                                 Get.delete<HomeLoanController>();
-                                Get.to(() => chooseScreenHLScreen(
+                                Get.to(() => NotAvailablePage(
                                     
                                     ));
                               } else if (index == 3) {
@@ -1098,5 +1118,9 @@ SingleChildScrollView(
 
         
   }
+
+
+
+
 }
 

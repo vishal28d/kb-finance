@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+  DateTime? newDate ;
 class DatePickerField extends StatelessWidget {
-  final DateTime? date;
-  final String labelText;
-  final ValueChanged<DateTime?> onChanged;
+  final DateTime? date ; // Immutable date field
+  final String labelText; // Label for the date field
+  final ValueChanged<DateTime?> onChanged; // Callback to notify parent of changes
 
   const DatePickerField({
     Key? key,
@@ -13,15 +14,18 @@ class DatePickerField extends StatelessWidget {
     required this.onChanged,
   }) : super(key: key);
 
+
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: date ?? DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
+      initialDate: date ?? DateTime.now(), // Set initial date
+      firstDate: DateTime(1900), // Minimum selectable date
+      lastDate: DateTime(2100), // Maximum selectable date
     );
+
     if (pickedDate != null && pickedDate != date) {
-      onChanged(pickedDate);
+      onChanged(pickedDate); // Notify parent with the selected date
+      newDate = pickedDate ;
     }
   }
 
@@ -35,20 +39,20 @@ class DatePickerField extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         InkWell(
-          onTap: () => _selectDate(context),
+          onTap: () => _selectDate(context), // Open date picker on tap
           child: Container(
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey), // Border styling
+              borderRadius: BorderRadius.circular(8), // Rounded corners
             ),
             child: Text(
-              date != null
-                  ? DateFormat('dd/MM/yyyy').format(date!)
+              newDate != null
+                  ? DateFormat('dd/MM/yyyy').format(newDate!) // Format the selected date
                   : 'Select Date',
               style: TextStyle(
-                color: date != null ? Colors.black : Colors.grey,
+                color: date != null ? Colors.black : Colors.grey, // Change color based on selection
               ),
             ),
           ),

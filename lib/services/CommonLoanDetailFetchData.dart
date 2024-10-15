@@ -6,17 +6,17 @@ class CommonLoanDataFetcher {
       FirebaseFirestore.instance.collection('LoanFormDetails');
 
          // Initialize lists for each loan status
-      List<List<String>> pendingLoans = [];
-      List<List<String>> rmAssignedLoans = [];
-      List<List<String>> forVerificationLoans = [];
-      List<List<String>> toCreditTeamLoans = [];
-      List<List<String>> approvedLoans = [];
-      List<List<String>> declinedLoans = [];
-      List<List<String>> sanctionedLoans = [];
-      List<List<String>> disbursedLoans = [];
+      List<Map<String, dynamic>> pendingLoans = [];
+      List<Map<String, dynamic>> rmAssignedLoans = [];
+      List<Map<String, dynamic>> forVerificationLoans = [];
+      List<Map<String, dynamic>> toCreditTeamLoans = [];
+      List<Map<String, dynamic>> approvedLoans = [];
+      List<Map<String, dynamic>> declinedLoans = [];
+      List<Map<String, dynamic>> sanctionedLoans = [];
+      List<Map<String, dynamic>> disbursedLoans = [];
 
   // Function to fetch all loan data and return a List<List<String>>
-  Future<List<List<String>>> fetchAllLoanDetails() async {
+  Future<List<Map<String,dynamic>>> fetchAllLoanDetails() async {
 
        pendingLoans = [];
        rmAssignedLoans = [];
@@ -34,84 +34,58 @@ class CommonLoanDataFetcher {
       QuerySnapshot querySnapshot = await loanFormDetails.get();
 
       // Initialize an empty list to hold loan details for each document
-      List<List<String>> allLoanDetails = [];
+      List<Map<String, dynamic>> allLoanDetails = [];
 
       // Iterate through the documents in the collection
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+         data["Document Id"] = doc.id; // Add document ID to the map
 
-        // Convert the Map<String, dynamic> to a List<String>
-        List<String> loanDetails = [
-          "${data['name'] ?? 'N/A'}",
-          "${data['mobile'] ?? 'N/A'}",
-          "${data['email'] ?? 'N/A'}",
-          "${data['alternateMobile'] ?? 'N/A'}",
-          "${data['loanAmount'] ?? 'N/A'}",
-          "${data['maritalStatus'] ?? 'N/A'}",
-          "${data['currentAddress'] ?? 'N/A'}",
-          "${data['currentPin'] ?? 'N/A'}",
-          "${data['currentLandmark'] ?? 'N/A'}",
-          "${data['houseType'] ?? 'N/A'}",
-          "${data['SpouseName'] ?? 'N/A'}",
-          "${data['SpouseMobile'] ?? 'N/A'}",
-          "${data['yearsAtCity'] ?? 'N/A'}",
-          "${data['ownershipStatus'] ?? 'N/A'}",
-          "${data['permanentAddress'] ?? 'N/A'}",
-          "${data['permanentLandmark'] ?? 'N/A'}",
-          "${data['permanentPin'] ?? 'N/A'}",
-          "${data['selectedReligion'] ?? 'N/A'}",
-          "${data['selectedLoanType'] ?? 'N/A'}",
-          "${data['permanentSquareFeet'] ?? 'N/A'}", //19
-          "${data['loanStatus'] ?? 'N/A'}",
-          doc.id, 
-          "${data['SpouseDob'] ?? 'N/A'}",    //22
-          "${data['motherName'] ?? 'N/A'}",
-          "${data['nomineeDob'] ?? 'N/A'}",
-          "${data['nomineeName'] ?? 'N/A'}",
-          "${data['nomineeRelation'] ?? 'N/A'}",
-          "${data['permanentOwnershipStatus'] ?? 'N/A'}",
-          "${data['permanentYearsAtCity'] ?? 'N/A'}",
-          "${data['selectedCaste'] ?? 'N/A'}", //29
-          "${data['createdBy'] ?? 'N/A'}",
-
-        ];
+      String loanStatus = '';
+            // Check if "Loan Status" key exists and retrieve its value
+          
+              loanStatus = data['Loan Status']; 
+              // print(loanStatus) ;
+              // print(data.containsKey('Loan Status')) ;
 
 
-         // Append loan details to the corresponding list based on loan status
-        switch (loanDetails[20]) { 
+    // Append loan details to the corresponding list based on loan status
+        switch (loanStatus) { 
           case 'Pending':
-            pendingLoans.add(loanDetails);
+            pendingLoans.add(data);
             break;
           case 'RM Assigned':
-            rmAssignedLoans.add(loanDetails);
+            rmAssignedLoans.add(data);
             break;
           case 'For Verification':
-            forVerificationLoans.add(loanDetails);
+            forVerificationLoans.add(data);
             break;
           case 'To Credit Team':
-            toCreditTeamLoans.add(loanDetails);
+            toCreditTeamLoans.add(data);
             break;
           case 'Approved':
-            approvedLoans.add(loanDetails);
+            approvedLoans.add(data);
             break;
           case 'Decline':
-            declinedLoans.add(loanDetails);
+            declinedLoans.add(data);
             break;
           case 'Sanctioned':
-            sanctionedLoans.add(loanDetails);
+            sanctionedLoans.add(data);
             break;
           case 'Disbursed':
-            disbursedLoans.add(loanDetails);
+            disbursedLoans.add(data);
             break;
-          default: pendingLoans.add(loanDetails);
+          default: pendingLoans.add(data);
             break;
         }
 
         // Add the loan details of the current document to the list
-        allLoanDetails.add(loanDetails);
+        allLoanDetails.add(data);
       }
 
-      return allLoanDetails; // Return a list of loan details for all documents
+      print(allLoanDetails) ;
+
+      return allLoanDetails; 
     } catch (e) {
       print("Error fetching loan details: $e");
       return [];

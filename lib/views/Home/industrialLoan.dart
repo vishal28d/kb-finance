@@ -1,4 +1,5 @@
 import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';  // Ensure this import for SVGs
@@ -55,7 +56,7 @@ class IndustrialLoan extends StatelessWidget {
                   (index) => GestureDetector(
                     onTap: () {
                       // Handle navigation on tap based on index
-                      Get.to(() => CommonLoanForm());
+                      Get.to(() => NotAvailablePage()  );
                     },
                     child: Column(
                       children: [
