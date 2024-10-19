@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 //flutter
 import 'package:credit_app/views/BusinessLoan/choose_screen_blscreen.dart';
-import 'package:credit_app/views/HomeLoan/choose_screen_hlscreen.dart';
+
 import 'package:credit_app/views/LoanAgainstProperty/choose_screen_lapscreen.dart';
 import 'package:credit_app/views/OtherLoan/other_loan_screen.dart';
 import 'package:credit_app/views/OtherServices/other_service.dart';
@@ -10,6 +10,7 @@ import 'package:credit_app/widget/appBarWidget.dart';
 // import 'package:credit_app/widget/drawer_widget.dart';
 import 'package:credit_app/widget/elevated_button_widget.dart';
 import 'package:credit_app/utils/global.dart' as global;
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:flutter/material.dart';
 //controllers
 import 'package:credit_app/controllers/splashController.dart';
@@ -27,6 +28,7 @@ class HomeScreen extends BaseRoute {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () {
         return Future.value(true);
@@ -97,9 +99,8 @@ class HomeScreen extends BaseRoute {
                                                 o: o,
                                               ));
                                         } else if (index == 2) {
-                                          Get.to(() => chooseScreenHLScreen(
-                                                a: a,
-                                                o: o,
+                                          Get.to(() => NotAvailablePage(
+                                               
                                               ));
                                         } else if (index == 3) {
                                           Get.to(() => chooseScreenLAPScreen(

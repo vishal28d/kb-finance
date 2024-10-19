@@ -1,4 +1,5 @@
 import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';  // Ensure this import for SVGs
@@ -6,20 +7,18 @@ import 'package:flutter_svg/flutter_svg.dart';  // Ensure this import for SVGs
 class IndustrialLoan extends StatelessWidget {
   final List<String> loanNames = [
     'Factory Purchase',
-    'Project Loan',
+    'Project \n Loan',
     'Machinery Loan',
     'Factory Mortgage'
   ];
 
   final List<String> iconList = [
-    'assets/bank.svg',
-    'assets/businessman-and-dollar-coin-svgrepo-com.svg',
-    'assets/business-svgrepo-com.svg',
-    'assets/card.svg',
-    'assets/bank.svg',
-    'assets/Group 650.svg',
-    'assets/otherloan.svg',
-    'assets/otherloanservice.svg'
+    'assets/loan_icons/factory_purchase.png',
+    'assets/loan_icons/project_loan.png',
+    'assets/loan_icons/machinery_loan.png',
+    'assets/loan_icons/factory_mortgage.png',
+
+   
   ];
 
   @override
@@ -55,7 +54,7 @@ class IndustrialLoan extends StatelessWidget {
                   (index) => GestureDetector(
                     onTap: () {
                       // Handle navigation on tap based on index
-                      Get.to(() => CommonLoanForm());
+                      Get.to(() => NotAvailablePage()  );
                     },
                     child: Column(
                       children: [
@@ -76,9 +75,9 @@ class IndustrialLoan extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                                  padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                                   width: 32,
-                                  child: SvgPicture.asset(
+                                  child: Image.asset(
                                     iconList[index],
                                     height: 45,
                                     color: Color(0xFFC63437), // Applying color to SVG icons

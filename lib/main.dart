@@ -27,7 +27,7 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseAppCheck.instance.activate( androidProvider: AndroidProvider.playIntegrity,);
+  // await FirebaseAppCheck.instance.activate( androidProvider: AndroidProvider.playIntegrity,);
   runApp(ChangeNotifierProvider(
     create: (_) => LocaleProvider(),
     child: MyApp(),

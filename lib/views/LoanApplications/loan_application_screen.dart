@@ -3,14 +3,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_app/controllers/loan_application_controller.dart';
 import 'package:credit_app/services/CommonLoanDetailFetchData.dart';
-import 'package:credit_app/services/fetchDbData.dart';
+
 import 'package:credit_app/widget/appBarWidget.dart';
-import 'package:credit_app/widget/baseRoute.dart';
 import 'package:credit_app/widget/common_padding.dart';
 import 'package:credit_app/widget/custom_dropdown.dart';
 import 'package:credit_app/widget/custom_textformfield.dart';
 // import 'package:credit_app/widget/drawer_widget.dart';
 import 'package:credit_app/utils/global.dart' as global;
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:credit_app/widget/primary_button.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +22,15 @@ import 'loan_detail_screen.dart';
 
 class LoanApplicationScreen extends StatefulWidget {
 
+   final int initialTabIndex;  // Add a parameter for the initial tab index
+  LoanApplicationScreen({this.initialTabIndex = 0});
+
 
   @override
   State<LoanApplicationScreen> createState() => _LoanApplicationScreenState();
 }
 
-class _LoanApplicationScreenState extends State<LoanApplicationScreen> {
+class _LoanApplicationScreenState extends State<LoanApplicationScreen> with SingleTickerProviderStateMixin  {
   DateTime? _fromDate;
 
   DateTime? _toDate;
@@ -42,7 +45,7 @@ class _LoanApplicationScreenState extends State<LoanApplicationScreen> {
     "Personal Loan",
   ];
 
-  List<List<String>> loanDetails = [];
+  List<Map<String,dynamic>> loanDetails = [];
 
   String? email = '' ;
 
@@ -56,7 +59,21 @@ class _LoanApplicationScreenState extends State<LoanApplicationScreen> {
     fetchLoanData() ;
     _saveEmail() ;
     super.initState();
+     _tabController = TabController(length: 8, vsync: this );
+ 
+    // Set the initial tab using the passed parameter
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_tabController != null) {
+        _tabController!.animateTo(widget.initialTabIndex);
+      }
+    });
 
+  }
+
+   @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
   }
 
   // Function to fetch loan data using CommonLoanDataFetcher
@@ -120,7 +137,10 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
             style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)),
             onPressed: () async {
               Get.back(); // Close the dialog
-              await deleteLoanForm(documentId); // Delete the loan form
+             await deleteLoanForm(documentId); // Delete the loan form
+             setState(() {
+               fetchLoanData() ;
+             });
             },
             child: Text(
               'Delete',
@@ -284,11 +304,14 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
   }
 
 
- Widget loanApplicationList(BuildContext context , List<List<String>> loanDetails ) {
+ Widget loanApplicationList(BuildContext context , List<Map<String,dynamic>> loanDetails ) {
 
    var filteredLoanDetails = loanDetails.where((loanDetail) {
-    return loanDetail.length > 30 && loanDetail[30] == email; // Ensure loanDetail[22] exists and matches email
+
+    // print( "Created by ${loanDetail['Created By']}") ;
+    return loanDetail['Created By'] == email; // match both emails loggedin and createdby
   }).toList();
+
 
   // Check if the filtered list is empty and display a message
   if (filteredLoanDetails.isEmpty) {
@@ -301,9 +324,10 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
   }
   
   return ListView.builder(
-    itemCount: loanDetails.length, // Use the length of the loanDetails list
+    itemCount: filteredLoanDetails.length, // Use the length of the loanDetails list
     itemBuilder: (BuildContext context, int index) {
       final loanDetail = filteredLoanDetails[index]; // Get the current loan detail
+      
       return Container(
         margin: EdgeInsets.only(top: 8, bottom: 8),
         width: Get.width,
@@ -319,18 +343,18 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        loanDetail[18] ?? 'N/A', // Use the loan type from the current detail
+                        loanDetail['Selected Loan Type'] ?? 'N/A', // Use the loan type from the current detail
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 2, bottom: 2),
                         child: Text(
-                         "Name : " + loanDetail[0] ?? 'Date Not Available', // Placeholder for date
+                         "Name : ${loanDetail['Name']}" ?? 'Date Not Available', // Placeholder for date
                           style: Theme.of(context).primaryTextTheme.displayMedium,
                         ),
                       ),
                       Text(
-                        'Loan Amount : ${global.currencySymbol}${loanDetail[4]}', // Use the loan amount from the current detail
+                        'Loan Amount : ${global.currencySymbol}${loanDetail['Loan Amount']}', // Use the loan amount from the current detail
                         style: Theme.of(context).primaryTextTheme.displayMedium,
                       )
                     ],
@@ -365,8 +389,7 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
                                   ],
                                 ),
                                 onTap: () {
-
-                                  
+                                  Get.to(()=> NotAvailablePage()) ;
                                 },
                               ),
                             ),
@@ -392,11 +415,8 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
                                 onTap: () {
                                   
                                   Navigator.pop(context) ;
-                                 _showDeleteConfirmationDialog(context, loanDetail[21]); 
-                                 print('success delete') ;
-                                 setState(() {
-                                   fetchLoanData() ;
-                                 });
+                                _showDeleteConfirmationDialog(context, loanDetail["Document Id"]); 
+                               
                                   
                                 },
                               ),
@@ -473,8 +493,8 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
                                     // Update Firestore with new status
                                     FirebaseFirestore.instance
                                         .collection('LoanFormDetails')
-                                        .doc(loanDetail[21]) // Replace with actual docId
-                                        .update({'loanStatus': status['status']})
+                                        .doc(loanDetail["Document Id"]) // Replace with actual docId
+                                        .update({'Loan Status': status['status']})
                                         .then((_) => print("Loan status updated to ${status['status']}"))
                                         .catchError((e) => print("Error: $e"));
 
@@ -521,8 +541,10 @@ void _showDeleteConfirmationDialog(BuildContext context, String documentId) {
                                 onTap: () {
                                   Get.back();
                                   Get.to(() => LoanDetailScreen(
-                                    loanDetail: loanDetail,
+                                    loanDetails: loanDetail,
                                   ));
+                                print(loanDetail) ;
+
                                 },
                               ),
                             ),

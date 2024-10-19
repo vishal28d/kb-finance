@@ -40,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {}); // Update UI after fetching user data
   }
 
+
   Future<void> _logOut() async {
     try {
       await googleSignIn.signOut();
@@ -92,7 +93,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       margin: EdgeInsets.only(top: 0),
                       height: 180,
                       width: MediaQuery.of(context).size.width,
-                      child: Row(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(left: 28),
@@ -117,11 +120,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                SizedBox(height: 5,) ,
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      name ?? 'N/A',
-                                      style: Theme.of(context).primaryTextTheme.headlineMedium,
+                                      name?? "N/A" ,
+                                      style: Theme.of(context).primaryTextTheme.headlineMedium 
                                     ),
                                   ],
                                 ),
@@ -157,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text(phone ?? 'N/A', style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text(phone ?? 'N/A', style: Theme.of(context).textTheme.bodyLarge ),
                       )
                     ],
                   ),
@@ -182,13 +187,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
-                            child: Text('Email Id', style: Theme.of(context).textTheme.headlineSmall),
+                            child: Text('Email Id', style: Theme.of(context).textTheme.headlineSmall )  ,
                           ),
                         ],
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 05),
-                        child: Text(  email ?? 'N/A' , style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text(  email ?? 'N/A' , style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 14) ),
                       )
                     ],
                   ),
@@ -289,17 +294,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: 15),
                 Divider(),
                 SizedBox(height: 15),
-                ElevatedButton(
-                  child: Text('Log Out'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF800000),
-                    minimumSize: Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: _logOut, // Use _logOut method for the log out button
-                ),
+            ElevatedButton(
+  child: Text('Log Out'),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Color(0xFF800000) ,
+    minimumSize: Size(double.infinity, 50),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  onPressed: () async {
+    // Show the confirmation dialog
+    bool shouldLogOut = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Logout'),
+          content: Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF7E60BF)  ,
+              ),
+              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Return false to indicate cancel
+              },
+            ),
+            ElevatedButton(
+              child: Text('Log Out'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF800000)  ,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true to confirm logout
+                _logOut() ;
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+)
+
               ],
             )
           ],

@@ -91,10 +91,12 @@ class AddLeadController extends GetxController {
   'Monthly',
   'Quarterly',
   'Half-Yearly',
-  'Annually'
+  'Annually' ,
+  'None' ,
   ] ;
 
   List<dynamic>? loanSelectionOptions = [
+  'None' ,
   'Loan Takeover / BT',
   'Personal Loan',
   'Business Loan',
@@ -119,10 +121,17 @@ class AddLeadController extends GetxController {
   ] ;
 
 
-  var loanType = 'Personal Loan'.obs ;
+  var loanType = 'None'.obs ;
   var followUpStatus = 'Pending' ;
   var emiType = 'Monthly'.obs ;
-  var selectedLoan = 'Personal Loan'.obs ;
+  var selectedLoan = 'None'.obs ;
+  var RequiredEmiType = 'None'.obs ;
+
+  var RequiredSelectedLoan = 'None'.obs ;
+  var RequiredLoanamount = TextEditingController() ;
+  var RequiredBankName = TextEditingController() ;
+  var RequiredLoanTenure = TextEditingController() ;
+  var RequiredInterest = TextEditingController() ;
 
   
 
@@ -174,9 +183,9 @@ List<String> getLeadDetails() {
     'Mobile No: ${mobileno.text}',
     'Alternate Mobile: ${alternateMobile.text}', // Added alternate mobile field
     'Email: ${email.text}',
-    'Loan Amount: ${loanamount.text}',
+    'Existing Loan Amount: ${loanamount.text}',
     'Employment Type: $employmenttypeVal',
-    'Loan Type: ${selectedLoan.toString()}',
+    'Existing Loan Type: ${selectedLoan.toString()}',
     'Aadhar No: ${aadharno.text}',
     'PAN No: ${panno.text}',
     'Location: ${location.text}',
@@ -201,6 +210,14 @@ List<String> getLeadDetails() {
     'Follow Up Comments: ${followUpComments.text}', // Added follow-up comments field
     'Next Follow Up Date: ${nextFollowUpDate.value.toString()}', // Added next follow-up date field
     'Next Follow Up Time: ${nextFollowUpTime.value.hour}:${nextFollowUpTime.value.minute}', // Added next follow-up time field
+    'Required Loan Amount: ${RequiredLoanamount.text}' ,
+    'Required Loan Type: ${RequiredSelectedLoan}' ,
+    'Required Bank Name: ${RequiredBankName.text}' ,
+    'Required Loan Tenure: ${RequiredLoanTenure.text}' ,
+    'Required Loan Interest: ${RequiredInterest.text}' ,
+    'Required Loan EMI Type: ${RequiredEmiType}' ,
+
+
   ];
 }
 
@@ -281,6 +298,13 @@ List<String> getLeadDetails() {
       'Next Follow Up Date': nextFollowUpDate.value.toString(),
       'Next Follow Up Time': '${nextFollowUpTime.value.hour}:${nextFollowUpTime.value.minute}',
       'EMI Type':  emiType.toString() ,
+    'Required Loan Amount': RequiredLoanamount.text ,
+    'Required Loan Type':   RequiredSelectedLoan.value,
+    'Required Bank Name':   RequiredBankName.text ,
+    'Required Loan Tenure': RequiredLoanTenure.text ,
+    'Required Loan Interest': RequiredInterest.text,
+    'Required Loan EMI Type' : RequiredEmiType.value ,
+
     };
 
     // Add to Firestore

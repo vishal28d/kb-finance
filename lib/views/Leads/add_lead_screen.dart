@@ -167,9 +167,60 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             SizedBox(height: 5),
             _buildTimePicker('Next Follow-up Time', leadsController.nextFollowUpTime ),
 
-            // Loan Details
+          SizedBox(height: 10,) ,
+
+          Text('Required Loan Details', style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 5),
+            Text('Loan Type', style: commonTextStyle),
+            CustomDropDown(
+              hint: Text("Select Loan Type"),
+              list: leadsController.loanSelectionOptions ,
+              val: leadsController.RequiredSelectedLoan.value , 
+              onChanged: (newValue) {
+                leadsController.RequiredSelectedLoan.value = newValue; 
+              },
+            ),
+            SizedBox(height: 5),
+            Text('Loan Amount (Rs)', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter Loan Amount',
+              textEditingController: leadsController.RequiredLoanamount ,
+            ),
+            SizedBox(height: 5),
+            Text('Bank Name', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter Bank Name',
+              textEditingController: leadsController.RequiredBankName ,
+            ),
+            SizedBox(height: 5),
+            Text('Tenure', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter Tenure for required loan',
+              textEditingController: leadsController.RequiredLoanTenure ,
+            ),
+            SizedBox(height: 10,) ,
+            Text('Select EMI Type', style: commonTextStyle),
+             CustomDropDown(
+              hint: Text("Select EMI Type"),
+              list: leadsController.emiTypeList,
+              val: leadsController.RequiredEmiType.value, // Use .value if using Rx
+              onChanged: (newValue) {
+                leadsController.RequiredEmiType.value = newValue; // Update value
+              },
+            ),
+
+            SizedBox(height: 5),
+            Text('Interest Rate(%)', style: commonTextStyle),
+            CustomTextFormField(
+              hintText: 'Enter interest rate',
+              textEditingController: leadsController.RequiredInterest ,
+              textInputType: TextInputType.number,
+            ),
+
+
+            //existing Loan Details
             SizedBox(height: 20),
-            Text('Loan Details', style: Theme.of(context).textTheme.titleLarge),
+            Text('Existing Loan Details', style: Theme.of(context).textTheme.titleLarge),
             SizedBox(height: 5),
             Text('Loan Type', style: commonTextStyle),
             CustomDropDown(

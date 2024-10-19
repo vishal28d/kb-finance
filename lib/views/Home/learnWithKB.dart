@@ -53,17 +53,18 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
 class LearnWithKb extends StatelessWidget {
   final List<String> loanNames = [
-    'Blogs',
-    'Learn With Us',
-    'Loan Guide',
-    'Careers'
+    'Loan Documents',
+    'How to Sell Loans',
+    'How to DL Statement',
+    'How to Read Docs'
   ];
 
   final List<String> iconList = [
-    'assets/bank.svg',
-    'assets/businessman-and-dollar-coin-svgrepo-com.svg',
-    'assets/business-svgrepo-com.svg',
-    'assets/card.svg'
+    'assets/loan_icons/loan_document.png',
+    'assets/loan_icons/sell_loan.png',
+    'assets/loan_icons/demand_loan.png',
+    'assets/loan_icons/read_docs.png',
+    
   ];
 
   final List<String> urlList = [
@@ -132,9 +133,9 @@ class LearnWithKb extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                                  padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                                   width: 32,
-                                  child: SvgPicture.asset(
+                                  child: Image.asset(
                                     iconList[index % iconList.length], // Reusing icons cyclically
                                     height: 45,
                                     color: Color(0xFFC63437), // Applying color to SVG icons

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonLoanController extends GetxController {
@@ -135,50 +135,50 @@ class CommonLoanController extends GetxController {
 
     if (!validateForm()) return; 
 
-    _firestore.collection('LoanFormDetails').add({
-      'loanAmount': loanAmountController.text,
-      'name': nameController.text,
-      'motherName': motherNameController.text,
-      'email': emailController.text,
-      'mobile': mobileController.text,
-      'alternateMobile': alternateMobileController.text,
-      'SpouseName': SpouseNameController.text,
-      'SpouseMobile': SpouseMobileController.text,
-      'nomineeName': nomineeNameController.text,
-      'nomineeRelation': nomineeRelationController.text,
-      'currentAddress': currentAddressController.text,
-      'currentPin': currentPinController.text,
-      'currentLandmark': currentLandmarkController.text,
-      'yearsAtCity': yearsAtCityController.text,
-      'permanentAddress': permanentAddressController.text,
-      'permanentPin': permanentPinController.text,
-      'permanentLandmark': permanentLandmarkController.text,
-      'permanentSquareFeet': permanentSquareFeetController.text,
-      'permanentYearsAtCity': permanentYearsAtCityController.text,
-      'selectedReligion': selectedReligion.value,
-      'selectedCaste': selectedCaste.value,
-      'maritalStatus': maritalStatus.value,
-      'ownershipStatus': ownershipStatus.value,
-      'houseType': houseType.value,
-      'permanentOwnershipStatus': permanentOwnershipStatus.value,
-      'permanentHouseType': permanentHouseType.value,
-      'selectedLoanType': selectedLoanType.value,
-      'nomineeDob': nomineeDob.value?.toString(),
-      'SpouseDob': SpouseDob.value?.toString(),
-      'loanStatus': 'Pending' ,
-      'createdBy': email,
+    Map<String, dynamic> formData = {
+  'loanAmount': loanAmountController.text,
+  'name': nameController.text,
+  'motherName': motherNameController.text,
+  'email': emailController.text,
+  'mobile': mobileController.text,
+  'alternateMobile': alternateMobileController.text,
+  'SpouseName': SpouseNameController.text,
+  'SpouseMobile': SpouseMobileController.text,
+  'nomineeName': nomineeNameController.text,
+  'nomineeRelation': nomineeRelationController.text,
+  'currentAddress': currentAddressController.text,
+  'currentPin': currentPinController.text,
+  'currentLandmark': currentLandmarkController.text,
+  'yearsAtCity': yearsAtCityController.text,
+  'permanentAddress': permanentAddressController.text,
+  'permanentPin': permanentPinController.text,
+  'permanentLandmark': permanentLandmarkController.text,
+  'permanentSquareFeet': permanentSquareFeetController.text,
+  'permanentYearsAtCity': permanentYearsAtCityController.text,
+  'selectedReligion': selectedReligion.value,
+  'selectedCaste': selectedCaste.value,
+  'maritalStatus': maritalStatus.value,
+  'ownershipStatus': ownershipStatus.value,
+  'houseType': houseType.value,
+  'permanentOwnershipStatus': permanentOwnershipStatus.value,
+  'permanentHouseType': permanentHouseType.value,
+  'selectedLoanType': selectedLoanType.value,
+  'nomineeDob': nomineeDob.value?.toString(),
+  'SpouseDob': SpouseDob.value?.toString(),
+  'loanStatus': 'Pending',
+  'createdBy': email,
+};
+
+_firestore.collection('LoanFormDetails').add(formData).then((value) {
+  Get.snackbar("Success", "Form submitted successfully!",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green[400]);
+}).catchError((error) {
+  Get.snackbar("Error", "Error submitting form: $error",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.red[400]);
+});
 
 
-    }).then((value) {
-      Get.snackbar("Success", "Form submitted successfully!",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green[400]);
-      
-      
-    }).catchError((error) {
-      Get.snackbar("Error", "Error submitting form: $error",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red[400]);
-    });
   }
 }

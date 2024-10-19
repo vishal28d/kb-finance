@@ -63,6 +63,15 @@ class LeadDetailScreen extends BaseRoute {
   'Tenure Left': 'Tenure Left',
   'Bank': 'Bank',
 
+  //required
+    'EMI Type':  'EMI Type' ,
+    'Required Loan Amount':  'Required Loan Amount' ,
+    'Required Loan Type': 'Required Loan Type'  ,
+    'Required Bank Name': 'Required Bank Name' ,
+    'Required Loan Tenure': 'Required Loan Tenure' ,
+    'Required Loan Interest':   'Required Loan Interest' ,
+    'Required Loan EMI Type' :  'Required Loan EMI Type' ,
+
   // Miscellaneous
 };
 

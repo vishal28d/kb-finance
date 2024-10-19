@@ -1,21 +1,24 @@
 import 'package:credit_app/views/CommonLoanForm/common_loan_form.dart';
+import 'package:credit_app/widget/not_available_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';  // Ensure this import for SVGs
 
 class OtherLoansAndCreditCard extends StatelessWidget {
   final List<String> loanNames = [
-    'Micro Loan',
-    'Gold Loan',
-    'Education Loan',
-    'Credit Card'
+    'Micro \n Loan',
+    'Gold \n Loan',
+    'Education \n Loan',
+    'Credit \n Card'
   ];
 
   final List<String> iconList = [
-    'assets/bank.svg',
-    'assets/businessman-and-dollar-coin-svgrepo-com.svg',
+    'assets/loan_icons/micro_loan.png',
+    'assets/loan_icons/gold_loan.png',
+    'assets/loan_icons/education_loan.png',
+    'assets/loan_icons/credit_card.png' ,
+   
     'assets/business-svgrepo-com.svg',
-    'assets/card.svg',
     'assets/bank.svg',
     'assets/Group 650.svg',
     'assets/otherloan.svg',
@@ -55,7 +58,7 @@ class OtherLoansAndCreditCard extends StatelessWidget {
                   (index) => GestureDetector(
                     onTap: () {
                       // Handle navigation on tap based on index
-                      Get.to(() => CommonLoanForm());
+                      Get.to(() => NotAvailablePage());
                     },
                     child: Column(
                       children: [
@@ -76,9 +79,9 @@ class OtherLoansAndCreditCard extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                                  padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                                   width: 32,
-                                  child: SvgPicture.asset(
+                                  child: Image.asset(
                                     iconList[index],
                                     height: 45,
                                     // ignore: deprecated_member_use

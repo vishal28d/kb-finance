@@ -17,7 +17,7 @@ class BankerFormController extends GetxController {
 
   var filteredBanks = <String>[].obs;
   var selectedBank = ''.obs;
-
+  var yourEnteredBank = TextEditingController() ;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -47,10 +47,10 @@ Future<void> insertBankersDetail() async {
       'fullName': fullName,
       'email': email,
       'pincode': pincode,
-      'bank': bank,
       'state': state,
       'district': district,
       'selectedBank': selectedBankValue,
+      'yourEnteredBank': yourEnteredBank.text ,
       'createdAt': FieldValue.serverTimestamp(),  
     };
 

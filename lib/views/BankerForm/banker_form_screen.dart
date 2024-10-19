@@ -1,4 +1,4 @@
-import 'package:credit_app/constants/userSession.dart';
+
 import 'package:credit_app/views/BankerForm/Banker_form_Controller.dart';
 import 'package:credit_app/views/Login/register.dart';
 import 'package:credit_app/widget/primary_button.dart';
@@ -22,7 +22,8 @@ class BankerFormScreen extends GetView<BankerFormController> {
               // Select Bank TextFieldSearch
             SizedBox(height: 5,),
 
-             TextField(
+            Text('In Which Company You are Working?', style: Theme.of(context).textTheme.bodyLarge),
+            TextField(
               controller: controller.bankTextController,
               onChanged: (query) {
               // Call the function to filter the banks when text changes
@@ -40,6 +41,7 @@ class BankerFormScreen extends GetView<BankerFormController> {
         ),
         SizedBox(height: 4),
 
+     
 // Display the filtered results
 Obx(() {
   // Show the SizedBox only if there are filtered results or the user is typing
@@ -82,8 +84,20 @@ Obx(() {
   );
 }),
 
-
           SizedBox(height: 10),
+            Obx(() {
+                return (controller.selectedBank.value == 'OTHER' || controller.selectedBank.value=='OTHER '  )
+                  ? TextField(
+                      controller: controller.yourEnteredBank  ,
+                      decoration: InputDecoration(
+                        labelText: 'Enter your company name.',
+                        border: OutlineInputBorder(),
+                      ),
+                    )
+                  : SizedBox.shrink();  // This ensures that nothing is rendered when the condition is false
+              }),
+
+          SizedBox(height: 10,) ,
 
           // Display the selected bank
           Obx(() => Text(
@@ -93,7 +107,7 @@ Obx(() {
           SizedBox(height: 10),
 
               // Designation Input
-
+              Text('Enter your designation ?', style: Theme.of(context).textTheme.bodyLarge),
               TextField(
                 controller: controller.designationController,
                 decoration: InputDecoration(
@@ -103,6 +117,7 @@ Obx(() {
               ),
               SizedBox(height: 16),
               // Full Name Input
+              Text('Enter your full name.', style: Theme.of(context).textTheme.bodyLarge),
               TextField(
                 controller: controller.fullNameController,
                 decoration: InputDecoration(
@@ -112,6 +127,7 @@ Obx(() {
               ),
               SizedBox(height: 16),
               // Email ID Input
+              Text('Enter Email Id', style: Theme.of(context).textTheme.bodyLarge),
               TextField(
                 controller: controller.emailController,
                 decoration: InputDecoration(
@@ -122,6 +138,8 @@ Obx(() {
               ),
               SizedBox(height: 16),
               // Select State Dropdown
+
+              Text('Select State', style: Theme.of(context).textTheme.bodyLarge),
               Obx(
                 () => DropdownButtonFormField<String>(
                   style: TextStyle(
@@ -145,6 +163,7 @@ Obx(() {
               ),
               SizedBox(height: 16),
               // Select District Dropdown (based on selected state)
+              Text('Select District', style: Theme.of(context).textTheme.bodyLarge),
               Obx(() {
                 // Only show this dropdown if a state is selected
                 if (controller.selectedState.value.isNotEmpty) {
@@ -172,6 +191,7 @@ Obx(() {
               }),
               SizedBox(height: 16),
               // Pincode Input
+              Text('Enter PinCode', style: Theme.of(context).textTheme.bodyLarge),
               TextField(
                 controller: controller.pincodeController,
                 decoration: InputDecoration(
