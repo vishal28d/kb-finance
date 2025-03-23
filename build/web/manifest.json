@@ -1,6 +1,6 @@
 {
-    "name": "credit_app",
-    "short_name": "credit_app",
+    "name": "KB Finance",
+    "short_name": "KB Finance",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
