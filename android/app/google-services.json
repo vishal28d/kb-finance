@@ -1,0 +1,135 @@
+{
+  "project_info": {
+    "project_number": "854600484014",
+    "firebase_url": "https://kb-finance-app-default-rtdb.firebaseio.com",
+    "project_id": "kb-finance-app",
+    "storage_bucket": "kb-finance-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854600484014:android:8c2bda6404d994d1fed93f",
+        "android_client_info": {
+          "package_name": "com.acz.kbfinance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854600484014-9ap1ot505hje0pu0e1qbjno34qh6or5t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.acz.kbfinance",
+            "certificate_hash": "55edf7a365967e405cfa4aad14f6de2a05e2d301"
+          }
+        },
+        {
+          "client_id": "854600484014-4263cu199atfuiemnhi9hu1eo85tlsbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASHfzm72_vlKAgC-RcVTgerZDF1MkSqcc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854600484014-4263cu199atfuiemnhi9hu1eo85tlsbr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "854600484014-v9271ju6am2qrmm96ngvjujt9dgad9a2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.demo.creditapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854600484014:android:0e2bbc6d7addebd0fed93f",
+        "android_client_info": {
+          "package_name": "com.example.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854600484014-4263cu199atfuiemnhi9hu1eo85tlsbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASHfzm72_vlKAgC-RcVTgerZDF1MkSqcc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854600484014-4263cu199atfuiemnhi9hu1eo85tlsbr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "854600484014-v9271ju6am2qrmm96ngvjujt9dgad9a2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.demo.creditapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854600484014:android:b46248d71cdf5595fed93f",
+        "android_client_info": {
+          "package_name": "com.nat.creditapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854600484014-vdscbf6oq0mpfnfj01t090q0hdrinoh7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nat.creditapp",
+            "certificate_hash": "55edf7a365967e405cfa4aad14f6de2a05e2d301"
+          }
+        },
+        {
+          "client_id": "854600484014-4263cu199atfuiemnhi9hu1eo85tlsbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASHfzm72_vlKAgC-RcVTgerZDF1MkSqcc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854600484014-4263cu199atfuiemnhi9hu1eo85tlsbr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "854600484014-v9271ju6am2qrmm96ngvjujt9dgad9a2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.demo.creditapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
