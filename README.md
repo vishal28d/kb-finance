@@ -1,4 +1,4 @@
-## QuickLoan – Cross-Platform Finance App  
+## KB Finance (QuickLoan) – Cross-Platform Finance App  
 
 Developed a **cross-platform finance application with web dashboard** using **Flutter** for the frontend and **Firebase** for backend services.  
 
