@@ -10,6 +10,8 @@ Developed a **cross-platform finance application with web dashboard** using **Fl
 
 📥 **You can download the app from the deploy section.**
 
+** Admin Dashboard - https://kb-finance-admin.vercel.app/ **
+
 ### Screenshots  
 <p float="left">
   <img src="https://github.com/user-attachments/assets/3e2e0549-60ab-40d4-873e-a9c5ae46f930" width="25%" />
